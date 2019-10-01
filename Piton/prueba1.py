@@ -2,6 +2,46 @@ import pygame, sys
 from pygame.locals import *
 pygame.init()
 
+bulletcount = [0]
+
+class Enemy(pygame.sprite.Sprite):
+	def __init__(self,startpos,speed):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("placeenemy_tr.png")
+		self.rect = self.image.get_rect()
+		self.rect.inflate_ip(-6,-6)
+		self.init(startpos)
+		self.movepos = speed
+		htbxlist.append(self.rect)
+		self.bulletcounter = 0
+		
+	def init(self,startpos):
+		self.rect.x = startpos[0]
+		self.rect.y = startpos[1]
+		self.rect.move([0,0])
+		
+	def update(self):
+		
+		if self.rect.collidepoint(600,60):
+			self.movepos = [-2,0]
+		elif self.rect.collidepoint(20,60):
+			self.movepos = [2,0]
+			
+		self.rect.move_ip(self.movepos)
+		pygame.event.pump()
+		if not area.contains(self.rect):
+			self.delete()
+		self.bulletcounter += 1
+		if self.bulletcounter == 20:
+			bullet.append(Bullet([0,5],[self.rect.x,self.rect.y + 40]))
+			bullet.append(Bullet([-2,4],[self.rect.x - 50,self.rect.y + 40]))
+			bullet.append(Bullet([2,4],[self.rect.x + 50,self.rect.y + 40]))
+			self.bulletcounter = 0
+		
+	def delete(self):
+		enemy.remove(self)
+		htbxlist.remove(self.rect)
+		
 class Bullet(pygame.sprite.Sprite):
 	def __init__(self,speed,startpos):
 		pygame.sprite.Sprite.__init__(self)
@@ -9,6 +49,8 @@ class Bullet(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-8,-8)
 		self.init(speed,startpos)
+		htbxlist.append(self.rect)
+		bulletcount[0] += 1
 	
 	def init(self,speed,startpos):
 		self.rect.x = startpos[0]
@@ -18,6 +60,15 @@ class Bullet(pygame.sprite.Sprite):
 	def update(self):
 		self.rect.move_ip(self.movepos)
 		pygame.event.pump()
+		if not area.contains(self.rect):
+			self.delete()
+		
+	def delete(self):
+		bullet.remove(self)
+		htbxlist.remove(self.rect)
+		
+	def __del__(self):
+		bulletcount[0] -= 1
 		
 class Player(pygame.sprite.Sprite):
 	
@@ -73,26 +124,14 @@ area = screen.get_rect()
 clock = pygame.time.Clock()
 clock
 font = pygame.font.Font("C:\Windows\Fonts\MSGOTHIC.TTC", 20)
-bullet = [None,None,None,None]
-bullet[0] = Bullet([0,0],[200,100])
-bullet[1] = Bullet([2,4],[250,100])
-bullet[2] = Bullet([-2,4],[300,100])
-bullet[3] = Bullet([0,8],[350,100])
-bullethtbxlist = list()
-counter = 0
-for i in bullet:
-	bullethtbxlist.append(i.rect)
-
+bullet = list()
+htbxlist = list()
+enemy = list()
+enemy.append(Enemy([300,60],[4,0]))
+enemy.append(Enemy([300,60],[-4,0]))
 while 1:
 	clock.tick_busy_loop(60)
-	counter += 1
-	if counter == 100:
-		bullet[1].init([2,4],[250,100])
-		bullet[2].init([-2,4],[300,100])
-		bullet[3].init([0,8],[350,100])
-		counter = 0
 	for event in pygame.event.get():
-	
 		if event.type == pygame.QUIT: sys.exit()
 		
 		elif event.type == pygame.KEYDOWN:
@@ -124,6 +163,9 @@ while 1:
 	screen.fill(0)
 	
 	player.update()
+	for i in enemy:
+		i.update()
+		screen.blit(i.image, i.rect)
 	for i in bullet:
 		i.update()
 		screen.blit(i.image, i.rect)
@@ -131,8 +173,10 @@ while 1:
 	screen.blit(player.image, player.rect)
 	
 	fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
+	bulletcountdisp = font.render("Balas:" + str(bulletcount[0]), True, (255,255,255))
 	screen.blit(fps, area)
-	if player.rect.collidelist(bullethtbxlist) != -1:
+	screen.blit(bulletcountdisp, (screen.get_width() - bulletcountdisp.get_width(),screen.get_height() - bulletcountdisp.get_height()))
+	if player.rect.collidelist(htbxlist) != -1:
 		player.rect.x = 300
 		player.rect.y = 300
 	pygame.display.flip()

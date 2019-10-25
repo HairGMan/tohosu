@@ -3,6 +3,7 @@ from clases import *
 
 debugbulletcount = 0
 
+#========= Lector de eventos: ==========
 eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
@@ -20,16 +21,19 @@ for i in range(len(eventlines)):
 
 eventnum = len(eventlist)
 
-def seekplayer(enemy):
-	angle = 0
-	return
-
+#========= Frames, eventos: =========
 clock = pygame.time.Clock()
 clock
 framecount = 0
 ev = 0
+
+#========= Runtime: =========
+
 while 1:
 	clock.tick_busy_loop(60)
+	
+	#========= Eventos de teclado: =========
+	
 	for event in pygame.event.get():		
 		if event.type == pygame.QUIT: sys.exit()
 		
@@ -60,12 +64,16 @@ while 1:
 					player.moveleft()
 					
 	screen.fill(0)
-
+	
+	#========= Manejo de eventos: =========
+	
 	if ev < eventnum:
 		if framecount == eventlist[ev][0]:
 			eventdict[eventlist[ev][1]](*eventlist[ev][2:])
 			ev += 1
 
+	#========= Actualizacion: =========
+	
 	player.update()
 	for i in enemies:
 		i.update()
@@ -80,12 +88,15 @@ while 1:
 	bulletcountdisp = font.render("Balas:" + str(debugbulletcount), True, (255,255,255))
 	screen.blit(fps, area)
 	screen.blit(bulletcountdisp, (screen.get_width() - bulletcountdisp.get_width(),screen.get_height() - bulletcountdisp.get_height()))
+	
+	#========= Invulnerabilidad (no se si dejarlo aca) =========
+	
 	if player.invulntime == 0:
 		if player.rect.collidelist(htbxlist) != -1:
 			player.hit()
 	elif player.invulntime > 90:
 		for i in bullets:
 			i.delete()
+	
 	pygame.display.flip()
-		
 	framecount += 1

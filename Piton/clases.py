@@ -171,7 +171,8 @@ def delete(id):
 	return
 
 size = width, height = 640, 480
-screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size,RESIZABLE)
+screentoscale = screen.copy()
 player = Player()
 area = screen.get_rect()
 font = pygame.font.Font("MSGOTHIC.TTC", 20)

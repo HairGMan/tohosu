@@ -29,12 +29,16 @@ ev = 0
 
 while 1:
 	clock.tick_busy_loop(60)
+	fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
+	bulletcountdisp = font.render("Balas:" + str(debugbulletcount), True, (255,255,255))
 	
 	#========= Eventos de teclado: =========
 	
 	for event in pygame.event.get():		
 		if event.type == pygame.QUIT: 
 			sys.exit()
+		if event.type == pygame.VIDEORESIZE:
+			screen = pygame.display.set_mode(event.dict['size'],RESIZABLE)
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LSHIFT:
 					player.state[2] = 2
@@ -61,7 +65,7 @@ while 1:
 			elif event.key == pygame.K_RIGHT:
 					player.moveleft()
 					
-	screen.fill(0)
+	screentoscale.fill(0)
 	
 	#========= Manejo de eventos: =========
 	
@@ -75,17 +79,15 @@ while 1:
 	player.update()
 	for i in enemies:
 		i.update()
-		screen.blit(i.image, i.rect)
+		screentoscale.blit(i.image, i.rect)
 	for i in bullets:
 		i.update()
-		screen.blit(i.image, i.rect)
+		screentoscale.blit(i.image, i.rect)
 		
-	screen.blit(player.image, player.rect)
-		
-	fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
-	bulletcountdisp = font.render("Balas:" + str(debugbulletcount), True, (255,255,255))
-	screen.blit(fps, area)
-	screen.blit(bulletcountdisp, (screen.get_width() - bulletcountdisp.get_width(),screen.get_height() - bulletcountdisp.get_height()))
+	screentoscale.blit(player.image, player.rect)
+	screentoscale.blit(fps, area)
+	screentoscale.blit(bulletcountdisp, (screen.get_width() - bulletcountdisp.get_width(),screen.get_height() - bulletcountdisp.get_height()))
+	screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 	
 	#========= Invulnerabilidad (no se si dejarlo aca) =========
 	

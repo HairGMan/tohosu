@@ -2,7 +2,7 @@ import clases
 from clases import *
 
 #========= Que nivel?: ==============
-nombreNivel = "/home/joaqo/touhosu/NivelPrueba"
+nombreNivel = "../nivelprueba"
 
 #========= Funcion de salida:=========
 def haltandcatchfire():
@@ -41,7 +41,6 @@ ev = 0
 pygame.mixer.music.load(nombreNivel + "/musica.wav")
 pygame.mixer.music.play()
 background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
-screen.blit(background, (0, 0))
 
 while 1:
 	clock.tick_busy_loop(60)
@@ -81,7 +80,7 @@ while 1:
 			elif event.key == pygame.K_RIGHT:
 					player.moveleft()
 					
-	screentoscale.fill(0)
+	screentoscale.blit(background, (0, 0))
 	
 	#========= Manejo de eventos: =========
 	

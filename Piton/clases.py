@@ -126,12 +126,20 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.state[0] = 1
 
+def createenemy(startpos,pattern,patternspeed,delay):
+	enemies.append(Enemy(startpos,pattern,patternspeed,delay))
+	return
+	
+def move():
+	return
+
+def delete(id):
+	enemies[id].delete()
+	return
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
 player = Player()
 area = screen.get_rect()
-clock = pygame.time.Clock()
-clock
 font = pygame.font.Font("MSGOTHIC.TTC", 20)
 bullets = list()
 htbxlist = list()

@@ -1,1 +1,1 @@
-nada wexd
+240 enemy 50 50 50 50 50

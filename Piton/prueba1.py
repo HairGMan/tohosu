@@ -12,16 +12,17 @@ eventfile = open("eventos.txt","r")
 eventlines = eventfile.readlines()
 eventlist = list()
 
-for i in eventlines:
-	eventlist.append((i.split()))
-	for d in eventlist[eventlines.index(i)]:
-		if eventlist[eventlines.index(i)].index(d) != 1:
-			d = int(d)
+for i in range(len(eventlines)):
+	eventlist.append((eventlines[i].split()))
+	for d in range(len(eventlist[i])):
+		if d != 1:
+			eventlist[i][d] = int(eventlist[i][d])
+
+eventnum = len(eventlist)
 
 def seekplayer(enemy):
 	angle = 0
 	return
-
 
 clock = pygame.time.Clock()
 clock
@@ -33,9 +34,9 @@ while 1:
 		if event.type == pygame.QUIT: sys.exit()
 		
 		elif event.type == pygame.KEYDOWN:
-		if event.key == pygame.K_LSHIFT:
-				player.state[2] = 2
-				player.update()
+			if event.key == pygame.K_LSHIFT:
+					player.state[2] = 2
+					player.update()
 			if event.key == pygame.K_UP:
 					player.moveup()
 			elif event.key == pygame.K_DOWN:
@@ -60,9 +61,10 @@ while 1:
 					
 	screen.fill(0)
 
-	if framecount == eventlist[ev][0]:
-		eventdict[eventlist[ev][1]](*eventlist[ev][2])
-		ev += 1
+	if ev < eventnum:
+		if framecount == eventlist[ev][0]:
+			eventdict[eventlist[ev][1]](*eventlist[ev][2:])
+			ev += 1
 
 	player.update()
 	for i in enemies:
@@ -87,4 +89,3 @@ while 1:
 	pygame.display.flip()
 		
 	framecount += 1
-	runtime()

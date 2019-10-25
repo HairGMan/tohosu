@@ -10,6 +10,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.rect.inflate_ip(-6,-6)
 		self.init(startpos)
 		htbxlist.append(self.rect)
+		self.movepos = (0,0)
 		
 	def init(self,startpos):
 		self.rect.x = startpos[0]
@@ -17,12 +18,6 @@ class Enemy(pygame.sprite.Sprite):
 		self.rect.move([0,0])
 		
 	def update(self):
-		
-		if self.rect.collidepoint(600,60):
-			self.movepos = [-2,0]
-		elif self.rect.collidepoint(20,60):
-			self.movepos = [2,0]
-			
 		self.rect.move_ip(self.movepos)
 		pygame.event.pump()
 		
@@ -126,7 +121,8 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.state[0] = 1
 
-def createenemy(startpos,pattern,patternspeed,delay):
+def createenemy(startposx,startposy,pattern,patternspeed,delay):
+	startpos = (startposx,startposy)
 	enemies.append(Enemy(startpos,pattern,patternspeed,delay))
 	return
 	

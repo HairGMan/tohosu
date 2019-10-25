@@ -1,14 +1,25 @@
 import clases
 from clases import *
 
+#========= ¿Que nivel?: ==============
+nombreNivel = "/home/joaqo/touhosu/NivelPrueba"
+
+#========= Funcion de salida:=========
+def haltandcatchfire():
+        pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+        #aca iria alguna manera de llamar al proximo nivel
+        
 #========= Lector de eventos: ==========
 eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
-	"delete":	delete
+	"delete":	delete,
+        "end":          haltandcatchfire
 	}
-eventfile = open("eventos.txt","r")
+eventfile = open(nombreNivel + "/eventos.txt","r")
 eventlines = eventfile.readlines()
+eventfile.close()
 eventlist = list()
 
 for i in range(len(eventlines)):
@@ -26,6 +37,11 @@ framecount = 0
 ev = 0
 
 #========= Runtime: =========
+
+pygame.mixer.music.load(nombreNivel + "/musica.wav")
+pygame.mixer.music.play()
+background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
+screen.blit(background, (0, 0))
 
 while 1:
 	clock.tick_busy_loop(60)

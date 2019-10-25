@@ -1,13 +1,13 @@
 import clases
 from clases import *
 
-#========= ¿Que nivel?: ==============
+#========= Que nivel?: ==============
 nombreNivel = "/home/joaqo/touhosu/NivelPrueba"
 
 #========= Funcion de salida:=========
 def haltandcatchfire():
         pygame.mixer.music.stop()
-        pygame.mixer.music.unload()
+#        pygame.mixer.music.unload()
         #aca iria alguna manera de llamar al proximo nivel
         
 #========= Lector de eventos: ==========

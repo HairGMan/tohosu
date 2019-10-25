@@ -1,0 +1,5 @@
+Empiezo esto así no nos perdemos
+1er cambio:
+-enemy.shoot() agregado
+-2 patrones verga para debug
+-ids de enemigos agregadas

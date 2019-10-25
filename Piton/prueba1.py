@@ -1,8 +1,6 @@
 import clases
 from clases import *
 
-debugbulletcount = 0
-
 #========= Lector de eventos: ==========
 eventdict = {
 	"enemy" :	createenemy,
@@ -35,8 +33,8 @@ while 1:
 	#========= Eventos de teclado: =========
 	
 	for event in pygame.event.get():		
-		if event.type == pygame.QUIT: sys.exit()
-		
+		if event.type == pygame.QUIT: 
+			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LSHIFT:
 					player.state[2] = 2

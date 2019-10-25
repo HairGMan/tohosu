@@ -3,9 +3,10 @@ from pygame.locals import *
 pygame.init()
 
 currentenemyid = 0
+debugbulletcount = 0
 
 class Enemy(pygame.sprite.Sprite):
-	def __init__(self,startpos,pattern,patternspeed,delay):
+	def __init__(self,startpos,pattern,patternspeed,bulletspeed,delay):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("placeenemy_tr.png")
 		self.rect = self.image.get_rect()
@@ -14,6 +15,10 @@ class Enemy(pygame.sprite.Sprite):
 		htbxlist.append(self.rect)
 		self.movepos = (0,0)
 		self.moveclock = 0
+		self.shootclock = delay
+		self.pattern = pattern
+		self.patternspeed = patternspeed
+		self.bulletspeed = bulletspeed
 		global currentenemyid
 		self.id = currentenemyid
 		currentenemyid += 1
@@ -27,7 +32,19 @@ class Enemy(pygame.sprite.Sprite):
 		self.moveclock = steps
 		self.movepos = xy
 		
+	def shoot(self):
+		if self.pattern == 1:
+			bullets.append(BulletA((0,self.bulletspeed),(self.rect.x,self.rect.y)))
+		elif self.pattern == 2:
+			bullets.append(BulletB((1,self.bulletspeed),(self.rect.x,self.rect.y)))
+			bullets.append(BulletB((-1,self.bulletspeed),(self.rect.x,self.rect.y)))
+		self.shootclock = self.patternspeed
+
 	def update(self):
+		if self.shootclock == 0:
+			self.shoot()
+		else:
+			self.shootclock -= 1
 		if self.moveclock == 0:
 			self.movepos = (0,0)
 		else:
@@ -135,11 +152,11 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.state[0] = 1
 
-def createenemy(startposx,startposy,pattern,patternspeed,delay):
+def createenemy(startposx,startposy,pattern,patternspeed,bulletspeed,delay):
 	startpos = (startposx,startposy)
-	enemies.append(Enemy(startpos,pattern,patternspeed,delay))
+	enemies.append(Enemy(startpos,pattern,patternspeed,bulletspeed,delay))
 	return
-	
+
 def move(id,x,y,steps,mode):
 	xy = (x,y)
 	for e in enemies:
@@ -152,6 +169,7 @@ def delete(id):
 		if e.id == id:
 			e.delete()
 	return
+
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
 player = Player()

@@ -86,7 +86,7 @@ while 1:
 		
 	screentoscale.blit(player.image, player.rect)
 	screentoscale.blit(fps, area)
-	screentoscale.blit(bulletcountdisp, (screen.get_width() - bulletcountdisp.get_width(),screen.get_height() - bulletcountdisp.get_height()))
+	screentoscale.blit(bulletcountdisp, (screentoscale.get_width() - bulletcountdisp.get_width(),screentoscale.get_height() - bulletcountdisp.get_height()))
 	screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 	
 	#========= Invulnerabilidad (no se si dejarlo aca) =========

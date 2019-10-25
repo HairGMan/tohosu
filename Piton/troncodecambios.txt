@@ -3,3 +3,5 @@ Empiezo esto así no nos perdemos
 -enemy.shoot() agregado
 -2 patrones verga para debug
 -ids de enemigos agregadas
+2do:
+-Pantalla reescalable

@@ -170,7 +170,7 @@ def delete(id):
 			e.delete()
 	return
 
-size = width, height = 640, 480
+size = width, height = 768, 432
 screen = pygame.display.set_mode(size,RESIZABLE)
 screentoscale = screen.copy()
 player = Player()

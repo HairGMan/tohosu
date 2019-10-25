@@ -56,7 +56,7 @@ while 1:
 			screen = pygame.display.set_mode(event.dict['size'],RESIZABLE)
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_LSHIFT:
-					player.state[2] = 2
+					player.state[2] = 1
 					player.update()
 			if event.key == pygame.K_UP:
 					player.moveup()
@@ -69,7 +69,7 @@ while 1:
 						
 		elif event.type == pygame.KEYUP:
 			if event.key == pygame.K_LSHIFT:
-				player.state[2] = 6
+				player.state[2] = 3
 				player.update()
 			if event.key == pygame.K_UP:
 					player.movedown()

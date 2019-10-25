@@ -8,7 +8,7 @@ debugbulletcount = 0
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self,startpos,pattern,patternspeed,bulletspeed,delay):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load("placeenemysmall_tr.png")
+		self.image = pygame.image.load("sprites/placeenemysmall_tr.png")
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		self.init(startpos)
@@ -85,14 +85,14 @@ class Bullet(pygame.sprite.Sprite):
 		
 class BulletA(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("bullet4_tr.png")
+		self.image = pygame.image.load("sprites/bullet4_tr.png")
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		Bullet.__init__(self,speed,startpos)
 
 class BulletB(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("bulletbig3_tr.png")
+		self.image = pygame.image.load("sprites/bulletbig3_tr.png")
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-12,-12)
 		Bullet.__init__(self,speed,startpos)
@@ -101,17 +101,16 @@ class Player(pygame.sprite.Sprite):
 	
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load("placehtbxsmall_tr.png")
+		self.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
 		self.rect = self.image.get_rect()
-		self.rect.inflate_ip(-5,-5)
-		self.state = [0,0,6]
+		self.rect.inflate_ip(-2,-2)
 		self.invulntime = 0
 		self.init()
 		
 	def init(self):
 		self.rect.x = 300
 		self.rect.y = 300
-		self.state = [0,0,6]
+		self.state = [0,0,3]
 		self.movepos = [0,0]
 
 	def update(self):

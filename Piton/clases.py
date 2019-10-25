@@ -2,6 +2,8 @@ import pygame, sys
 from pygame.locals import *
 pygame.init()
 
+currentenemyid = 0
+
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self,startpos,pattern,patternspeed,delay):
 		pygame.sprite.Sprite.__init__(self)
@@ -11,13 +13,25 @@ class Enemy(pygame.sprite.Sprite):
 		self.init(startpos)
 		htbxlist.append(self.rect)
 		self.movepos = (0,0)
+		self.moveclock = 0
+		global currentenemyid
+		self.id = currentenemyid
+		currentenemyid += 1
 		
 	def init(self,startpos):
 		self.rect.x = startpos[0]
 		self.rect.y = startpos[1]
 		self.rect.move([0,0])
 		
+	def move(self,xy,steps):
+		self.moveclock = steps
+		self.movepos = xy
+		
 	def update(self):
+		if self.moveclock == 0:
+			self.movepos = (0,0)
+		else:
+			self.moveclock -= 1
 		self.rect.move_ip(self.movepos)
 		pygame.event.pump()
 		
@@ -126,11 +140,17 @@ def createenemy(startposx,startposy,pattern,patternspeed,delay):
 	enemies.append(Enemy(startpos,pattern,patternspeed,delay))
 	return
 	
-def move():
+def move(id,x,y,steps,mode):
+	xy = (x,y)
+	for e in enemies:
+		if e.id == id:
+			e.move(xy,steps)
 	return
 
 def delete(id):
-	enemies[id].delete()
+	for e in enemies:
+		if e.id == id:
+			e.delete()
 	return
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)

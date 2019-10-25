@@ -6,3 +6,27 @@
 360 enemy 300 50 0 5 10
 420 enemy 350 50 0 5 10
 480 enemy 400 50 0 5 10
+540 move 0 0 5 24 0
+600 move 1 0 5 24 0
+660 move 2 0 5 24 0
+720 move 3 0 5 24 0
+780 move 4 0 5 24 0
+840 move 5 0 5 24 0
+900 move 6 0 5 24 0
+960 move 7 0 5 24 0
+1020 move 0 0 -5 24 0
+1021 move 1 0 -5 24 0
+1022 move 2 0 -5 24 0
+1023 move 3 0 -5 24 0
+1024 move 4 0 -5 24 0
+1025 move 5 0 -5 24 0
+1026 move 6 0 -5 24 0
+1027 move 7 0 -5 24 0
+1080 delete 0
+1081 delete 1
+1082 delete 2
+1083 delete 3
+1084 delete 4
+1085 delete 5
+1086 delete 6
+1087 delete 7

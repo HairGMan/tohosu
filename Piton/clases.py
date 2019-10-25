@@ -4,6 +4,7 @@ pygame.init()
 
 currentenemyid = 0
 debugbulletcount = 0
+framecount = 0
 
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self,startpos,pattern,patternspeed,bulletspeed,delay):
@@ -34,10 +35,10 @@ class Enemy(pygame.sprite.Sprite):
 		
 	def shoot(self):
 		if self.pattern == 1:
-			bullets.append(BulletA((0,self.bulletspeed),(self.rect.x,self.rect.y)))
+			bullets.append(BulletA((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
 		elif self.pattern == 2:
-			bullets.append(BulletB((1,self.bulletspeed),(self.rect.x,self.rect.y)))
-			bullets.append(BulletB((-1,self.bulletspeed),(self.rect.x,self.rect.y)))
+			bullets.append(BulletB([0.3,self.bulletspeed],(self.rect.x,self.rect.y)))
+			bullets.append(BulletB([-0.3,self.bulletspeed],(self.rect.x,self.rect.y)))
 		self.shootclock = self.patternspeed
 
 	def update(self):
@@ -63,14 +64,25 @@ class Bullet(pygame.sprite.Sprite):
 		htbxlist.append(self.rect)
 		global debugbulletcount
 		debugbulletcount += 1
+		self.moveinterval = 1
 	
 	def init(self,speed,startpos):
 		self.rect.x = startpos[0]
 		self.rect.y = startpos[1]
+		if abs(speed[0]) < 1 and abs(speed[0]) > 0:
+			self.moveinterval = 1/abs(speed[0])
+			speed[0] = speed[0]/abs(speed[0])
+			speed[1] = speed[1]*self.moveinterval
+		if abs(speed[1]) < 1 and abs(speed[1]) > 0:
+			self.moveinterval = 1/abs(speed[1])
+			speed[1] = speed[1]/abs(speed[1])
+			speed[0] = speed[0]*self.moveinterval
 		self.movepos = [speed[0],speed[1]]
 		
 	def update(self):
-		self.rect.move_ip(self.movepos)
+		global framecount
+		if framecount % self.moveinterval == 0:
+			self.rect.move_ip(self.movepos)
 		pygame.event.pump()
 		if not area.contains(self.rect):
 			self.delete()

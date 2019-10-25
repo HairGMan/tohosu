@@ -33,7 +33,6 @@ eventnum = len(eventlist)
 #========= Frames, eventos: =========
 clock = pygame.time.Clock()
 clock
-framecount = 0
 ev = 0
 
 #========= Runtime: =========

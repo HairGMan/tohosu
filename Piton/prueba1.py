@@ -15,7 +15,8 @@ eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
 	"delete":	delete,
-        "end":	haltandcatchfire
+    "end":		haltandcatchfire,
+	"toggle":	toggleshoot
 	}
 eventfile = open(nombreNivel + "/eventos.thi","r")
 eventlines = eventfile.readlines()
@@ -41,12 +42,14 @@ ev = 0
 pygame.mixer.music.load(nombreNivel + "/musica.wav")
 pygame.mixer.music.play()
 background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
+backgroundoffset = -0.0
+gui = pygame.image.load("sprites/gui_place_choto2_tr.png")
 
 while 1:
 	clock.tick_busy_loop(60)
 	fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
 	bulletcountdisp = font.render("Balas:" + str(clases.debugbulletcount), True, (255,255,255))
-	
+	backgroundoffset -= 0.05
 	#========= Eventos de teclado: =========
 	
 	for event in pygame.event.get():		
@@ -80,7 +83,7 @@ while 1:
 			elif event.key == pygame.K_RIGHT:
 					player.moveleft()
 					
-	screentoscale.blit(background, (0, 0))
+	screentoscale.blit(background, (0, backgroundoffset))
 	
 	#========= Manejo de eventos: =========
 	
@@ -100,6 +103,7 @@ while 1:
 		screentoscale.blit(i.image, i.rect)
 		
 	screentoscale.blit(player.image, player.rect)
+	screentoscale.blit(gui, area)
 	screentoscale.blit(fps, area)
 	screentoscale.blit(bulletcountdisp, (screentoscale.get_width() - bulletcountdisp.get_width(),screentoscale.get_height() - bulletcountdisp.get_height()))
 	screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))

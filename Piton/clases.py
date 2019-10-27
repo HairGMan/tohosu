@@ -23,6 +23,14 @@ class Enemy(pygame.sprite.Sprite):
 		global currentenemyid
 		self.id = currentenemyid
 		currentenemyid += 1
+		self.angleclock = 0.0
+		self.angleclockint = 0.0
+		self.patterndict = {
+			1:	self.PatternA,
+			2:	self.PatternB,
+			3:	self.PatternC,
+			4:	self.PatternD
+		}
 		
 	def init(self,startpos):
 		self.rect.x = startpos[0]
@@ -34,19 +42,28 @@ class Enemy(pygame.sprite.Sprite):
 		self.movepos = xy
 		
 	def shoot(self):
-		if self.pattern == 1:
-			bullets.append(BulletA((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
-		elif self.pattern == 2:
-			bullets.append(BulletB([1,self.bulletspeed],(self.rect.x,self.rect.y)))
-			bullets.append(BulletB([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
-		elif self.pattern == 3:
-			bullets.append(BulletA((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		if self.pattern != 0:
+			self.patterndict[self.pattern]()
 		self.shootclock = self.patternspeed
+		
+	def PatternA(self):
+		bullets.append(BulletA((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		
+	def PatternB(self):
+		bullets.append(BulletB([1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		bullets.append(BulletB([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		
+	def PatternC(self):
+		bullets.append(BulletA((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		
+	def PatternD(self):
+		bullets.append(BulletA((spiral(self.bulletspeed,self.angleclock)),(float(self.rect.x),float(self.rect.y))))
 
 	def update(self):
+		self.angleclock += self.angleclockint % 360
 		if self.shootclock == 0:
 			self.shoot()
-		else:
+		elif self.shootclock > 0:
 			self.shootclock -= 1
 		if self.moveclock == 0:
 			self.movepos = (0,0)
@@ -78,7 +95,7 @@ class Bullet(pygame.sprite.Sprite):
 		self.vectpos[1] += self.movepos[1]
 		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
 		pygame.event.pump()
-		if not area.contains(self.rect):
+		if not bulletliferect.contains(self.rect):
 			self.delete()
 		
 	def delete(self):
@@ -123,7 +140,7 @@ class Player(pygame.sprite.Sprite):
 	def update(self):
 		self.movepos = [(self.state[0] * self.state[2]),(self.state[1] * self.state[2])]
 		newpos = self.rect.move(self.movepos)
-		if area.contains(newpos):
+		if playrect.contains(newpos):
 			self.rect = newpos
 			pygame.event.pump()
 		if not self.invulntime == 0:
@@ -176,10 +193,22 @@ def delete(id):
 			e.delete()
 	return
 
+def toggleshoot(id,pattern,special = 0,fraction = 1):
+	for e in enemies:
+		if e.id == id:
+			e.pattern = pattern
+			e.shootclock = 0
+			if pattern == 4:
+				e.angleclockint = float(special) / float(fraction)
+	
 def trackplayer(enemy,player,speed):
 	distance = complex(float((enemy.rect.x - player.rect.x)),float((enemy.rect.y - player.rect.y)))
 	b_phase = phase(distance)
 	bulletdirection = rect(-speed,b_phase)
+	return bulletdirection.real, bulletdirection.imag
+	
+def spiral(speed,angle):
+	bulletdirection = rect(speed,(angle/180*pi))
 	return bulletdirection.real, bulletdirection.imag
 	
 size = width, height = 640, 360
@@ -187,6 +216,8 @@ screen = pygame.display.set_mode(size,RESIZABLE)
 screentoscale = screen.copy()
 player = Player()
 area = screen.get_rect()
+playrect = Rect(60,10,340,340)
+bulletliferect = Rect(30,0,400,360)
 font = pygame.font.Font("MSGOTHIC.TTC", 20)
 bullets = list()
 htbxlist = list()

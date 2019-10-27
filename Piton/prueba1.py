@@ -16,7 +16,7 @@ eventdict = {
 	"move" :	move,
 	"delete":	delete,
     "end":		haltandcatchfire,
-	"toggle":	toggleshoot
+	"switch":	switchshot
 	}
 eventfile = open(nombreNivel + "/eventos.thi","r")
 eventlines = eventfile.readlines()
@@ -43,7 +43,7 @@ pygame.mixer.music.load(nombreNivel + "/musica.wav")
 pygame.mixer.music.play()
 background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
 backgroundoffset = -0.0
-gui = pygame.image.load("sprites/gui_place_choto2_tr.png")
+gui = pygame.image.load("sprites/gui_place_choto2_tr.png").convert_alpha()
 
 while 1:
 	clock.tick_busy_loop(60)
@@ -97,12 +97,12 @@ while 1:
 	player.update()
 	for i in enemies:
 		i.update()
-		screentoscale.blit(i.image, i.rect)
+		screentoscale.blit(i.image, i.imgpos)
 	for i in bullets:
 		i.update()
-		screentoscale.blit(i.image, i.rect)
+		screentoscale.blit(i.image, i.imgpos)
 		
-	screentoscale.blit(player.image, player.rect)
+	screentoscale.blit(player.image, player.imgpos)
 	screentoscale.blit(gui, area)
 	screentoscale.blit(fps, (2,0))
 	screentoscale.blit(bulletcountdisp, (screentoscale.get_width() - bulletcountdisp.get_width(),screentoscale.get_height() - bulletcountdisp.get_height()))

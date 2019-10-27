@@ -1,14 +1,18 @@
 Empiezo esto así no nos perdemos
+
 1er cambio:
 -enemy.shoot() agregado
 -2 patrones verga para debug
 -ids de enemigos agregadas
+
 2do:
 -Pantalla reescalable
+
 26/10 - 1:
 -Animacion de invulnerabilidad (funciona con ifs, si les parece una cagada cambienlo)
 -Las balas estan vectorizadas y se pueden mover menos de 1 pixel por frame
 -La velocidad de balas en los atributos de enemy ahora esta separada en dos: el numero y la fraccion, si es 1 3 por ejemplo la bala se moveria 0.33 pixeles por segundo
+
 26/10 - 2:
 -trackplayer() agregada, si se pasa como argumento de Bullet esta sigue al jugador
 	-3 atributos: enemy, player, speed
@@ -16,3 +20,25 @@ Empiezo esto así no nos perdemos
 -Intente hacer el juego pantalla completa pero no funca por alguna razon, despues le tengo que preguntar al profe
 -Cambiado el nivel de prueba para que sea mas mejor y menos pior
 -Ahora la lista de eventos tiene extension .thi porque pinto
+
+27/10 - 1 (sin dormir):
+-Agregada spiral(),  si se pasa como argumento de Bullet sigue un espiral
+	-Agregado un reloj de angulos para los enemigos, decide cuantos grados se mueve el disparo por frame
+	-En conjunto con el intervalo de disparo hace cosas flasheras
+	-El reloj de angulos de un enemigo se cambia con el atributo especial del comando toggle
+	-Esto es muy confuso no me maten por favor
+	-Lo hice con complejos pero ahora que pienso una funcion seno quedaba mejor wekisde
+-Agregada instruccion toggle en el thi: cambia el patron y tipo de bala de cierto enemigo
+	-2 atributos: id y patrón
+	-3 atributos opcionales: tipo de bala, especial(lo que hace depende de que funcion trambolika de disparo hay), fraccion (divide al especial si se necesita un float)
+-Agregado un GUI choto que hice en 2 minutos
+	-No, no te podes salir del GUI, esta todo friasmente calculado
+	-Las balas mueren cuando salen del GUI en lugar de la pantalla
+-Ahora el fondo se mueve lento para arriba
+
+27/10 - 2 (dormido):
+-Arregladas las hitboxes que no se centraban en la imagen
+-Funcion spiral() cambiada a angletodir() porque me di cuenta que lo unico que hace es pasarte un numero polar a rectangular
+-Ahora el reloj de angulos mueve el angulo cada disparo en vez de cada frame
+-Cambiado toggle por switch
+-Agregado atributo special2 para switch, una segunda variable especifica de patron, en el caso del espiral decide cuantos espirales simultaneos dispara el enemigo

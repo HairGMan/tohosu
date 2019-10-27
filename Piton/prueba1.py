@@ -33,6 +33,7 @@ eventnum = len(eventlist)
 #========= Frames, eventos: =========
 clock = pygame.time.Clock()
 clock
+framecount = 0
 ev = 0
 
 #========= Runtime: =========
@@ -44,7 +45,7 @@ background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
 while 1:
 	clock.tick_busy_loop(60)
 	fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
-	bulletcountdisp = font.render("Balas:" + str(debugbulletcount), True, (255,255,255))
+	bulletcountdisp = font.render("Balas:" + str(clases.debugbulletcount), True, (255,255,255))
 	
 	#========= Eventos de teclado: =========
 	
@@ -108,9 +109,14 @@ while 1:
 	if player.invulntime == 0:
 		if player.rect.collidelist(htbxlist) != -1:
 			player.hit()
-	elif player.invulntime > 90:
-		for i in bullets:
-			i.delete()
-	
+	elif player.invulntime > 0:
+		if player.invulntime > 90:
+			for i in bullets:
+				i.delete()
+		if player.invulntime % 5 == 0:
+			if player.invulntime % 10 == 0:
+				player.image = pygame.Surface((0,0))
+			else:
+				player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
 	pygame.display.flip()
 	framecount += 1

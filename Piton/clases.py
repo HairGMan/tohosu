@@ -4,10 +4,9 @@ pygame.init()
 
 currentenemyid = 0
 debugbulletcount = 0
-framecount = 0
 
 class Enemy(pygame.sprite.Sprite):
-	def __init__(self,startpos,pattern,patternspeed,bulletspeed,delay):
+	def __init__(self,startpos,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("sprites/placeenemysmall_tr.png")
 		self.rect = self.image.get_rect()
@@ -19,7 +18,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.shootclock = delay
 		self.pattern = pattern
 		self.patternspeed = patternspeed
-		self.bulletspeed = bulletspeed
+		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
 		global currentenemyid
 		self.id = currentenemyid
 		currentenemyid += 1
@@ -37,8 +36,8 @@ class Enemy(pygame.sprite.Sprite):
 		if self.pattern == 1:
 			bullets.append(BulletA((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
 		elif self.pattern == 2:
-			bullets.append(BulletB([0.3,self.bulletspeed],(self.rect.x,self.rect.y)))
-			bullets.append(BulletB([-0.3,self.bulletspeed],(self.rect.x,self.rect.y)))
+			bullets.append(BulletB([1,self.bulletspeed],(self.rect.x,self.rect.y)))
+			bullets.append(BulletB([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
 		self.shootclock = self.patternspeed
 
 	def update(self):
@@ -64,32 +63,25 @@ class Bullet(pygame.sprite.Sprite):
 		htbxlist.append(self.rect)
 		global debugbulletcount
 		debugbulletcount += 1
-		self.moveinterval = 1
 	
 	def init(self,speed,startpos):
 		self.rect.x = startpos[0]
 		self.rect.y = startpos[1]
-		if abs(speed[0]) < 1 and abs(speed[0]) > 0:
-			self.moveinterval = 1/abs(speed[0])
-			speed[0] = speed[0]/abs(speed[0])
-			speed[1] = speed[1]*self.moveinterval
-		if abs(speed[1]) < 1 and abs(speed[1]) > 0:
-			self.moveinterval = 1/abs(speed[1])
-			speed[1] = speed[1]/abs(speed[1])
-			speed[0] = speed[0]*self.moveinterval
-		self.movepos = [speed[0],speed[1]]
+		self.movepos = speed
+		self.vectpos = [self.rect.x,self.rect.y]
 		
 	def update(self):
-		global framecount
-		if framecount % self.moveinterval == 0:
-			self.rect.move_ip(self.movepos)
+		self.vectpos[0] += self.movepos[0]
+		self.vectpos[1] += self.movepos[1]
+		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
 		pygame.event.pump()
 		if not area.contains(self.rect):
 			self.delete()
 		
 	def delete(self):
 		bullets.remove(self)
-		htbxlist.remove(self.rect)
+		if self.rect in htbxlist:
+			htbxlist.remove(self.rect)
 		
 	def __del__(self):
 		global debugbulletcount
@@ -163,9 +155,9 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.state[0] = 1
 
-def createenemy(startposx,startposy,pattern,patternspeed,bulletspeed,delay):
+def createenemy(startposx,startposy,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay):
 	startpos = (startposx,startposy)
-	enemies.append(Enemy(startpos,pattern,patternspeed,bulletspeed,delay))
+	enemies.append(Enemy(startpos,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay))
 	return
 
 def move(id,x,y,steps,mode):

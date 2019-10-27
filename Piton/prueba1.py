@@ -104,7 +104,7 @@ while 1:
 		
 	screentoscale.blit(player.image, player.rect)
 	screentoscale.blit(gui, area)
-	screentoscale.blit(fps, area)
+	screentoscale.blit(fps, (2,0))
 	screentoscale.blit(bulletcountdisp, (screentoscale.get_width() - bulletcountdisp.get_width(),screentoscale.get_height() - bulletcountdisp.get_height()))
 	screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 	

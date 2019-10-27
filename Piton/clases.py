@@ -7,7 +7,7 @@ currentenemyid = 0
 debugbulletcount = 0
 
 class Enemy(pygame.sprite.Sprite):
-	def __init__(self,startpos,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay):
+	def __init__(self,startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("sprites/placeenemysmall_tr.png")
 		self.rect = self.image.get_rect()
@@ -18,6 +18,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.moveclock = 0
 		self.shootclock = delay
 		self.pattern = pattern
+		self.bullettype = bullettype
 		self.patternspeed = patternspeed
 		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
 		global currentenemyid
@@ -30,6 +31,10 @@ class Enemy(pygame.sprite.Sprite):
 			2:	self.PatternB,
 			3:	self.PatternC,
 			4:	self.PatternD
+		}
+		self.bulletdict = {
+			1:	BulletA,
+			2:	BulletB
 		}
 		
 	def init(self,startpos):
@@ -47,17 +52,17 @@ class Enemy(pygame.sprite.Sprite):
 		self.shootclock = self.patternspeed
 		
 	def PatternA(self):
-		bullets.append(BulletA((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		bullets.append(self.bulletdict[self.bullettype]((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
 		
 	def PatternB(self):
-		bullets.append(BulletB([1,self.bulletspeed],(self.rect.x,self.rect.y)))
-		bullets.append(BulletB([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		bullets.append(self.bulletdict[self.bullettype]([1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		bullets.append(self.bulletdict[self.bullettype]([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
 		
 	def PatternC(self):
-		bullets.append(BulletA((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
 		
 	def PatternD(self):
-		bullets.append(BulletA((spiral(self.bulletspeed,self.angleclock)),(float(self.rect.x),float(self.rect.y))))
+		bullets.append(self.bulletdict[self.bullettype]((spiral(self.bulletspeed,self.angleclock)),(float(self.rect.x),float(self.rect.y))))
 
 	def update(self):
 		self.angleclock += self.angleclockint % 360
@@ -175,9 +180,9 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.state[0] = 1
 
-def createenemy(startposx,startposy,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay):
+def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay):
 	startpos = (startposx,startposy)
-	enemies.append(Enemy(startpos,pattern,patternspeed,bulletspeed,bulletspeedfrac,delay))
+	enemies.append(Enemy(startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay))
 	return
 
 def move(id,x,y,steps,mode):
@@ -193,10 +198,11 @@ def delete(id):
 			e.delete()
 	return
 
-def toggleshoot(id,pattern,special = 0,fraction = 1):
+def toggleshoot(id,pattern,bullettype = 1,special = 0,fraction = 1):
 	for e in enemies:
 		if e.id == id:
 			e.pattern = pattern
+			e.bullettype = bullettype
 			e.shootclock = 0
 			if pattern == 4:
 				e.angleclockint = float(special) / float(fraction)

@@ -15,9 +15,9 @@ eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
 	"delete":	delete,
-        "end":          haltandcatchfire
+        "end":	haltandcatchfire
 	}
-eventfile = open(nombreNivel + "/eventos.txt","r")
+eventfile = open(nombreNivel + "/eventos.thi","r")
 eventlines = eventfile.readlines()
 eventfile.close()
 eventlist = list()

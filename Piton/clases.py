@@ -1,4 +1,5 @@
 import pygame, sys
+from cmath import *
 from pygame.locals import *
 pygame.init()
 
@@ -38,6 +39,8 @@ class Enemy(pygame.sprite.Sprite):
 		elif self.pattern == 2:
 			bullets.append(BulletB([1,self.bulletspeed],(self.rect.x,self.rect.y)))
 			bullets.append(BulletB([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		elif self.pattern == 3:
+			bullets.append(BulletA((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
 		self.shootclock = self.patternspeed
 
 	def update(self):
@@ -112,7 +115,7 @@ class Player(pygame.sprite.Sprite):
 		self.init()
 		
 	def init(self):
-		self.rect.x = 300
+		self.rect.x = 200
 		self.rect.y = 300
 		self.state = [0,0,3]
 		self.movepos = [0,0]
@@ -127,7 +130,7 @@ class Player(pygame.sprite.Sprite):
 			self.invulntime -= 1
 			
 	def hit(self):
-			self.rect.x = 300
+			self.rect.x = 200
 			self.rect.y = 300
 			self.invulntime = 150
 
@@ -173,6 +176,12 @@ def delete(id):
 			e.delete()
 	return
 
+def trackplayer(enemy,player,speed):
+	distance = complex(float((enemy.rect.x - player.rect.x)),float((enemy.rect.y - player.rect.y)))
+	b_phase = phase(distance)
+	bulletdirection = rect(-speed,b_phase)
+	return bulletdirection.real, bulletdirection.imag
+	
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE)
 screentoscale = screen.copy()

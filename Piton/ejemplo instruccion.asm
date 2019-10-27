@@ -1,7 +1,7 @@
-230 enemy 3 6 3 20 5 40 		;atributos: tipo, patron, tipo balas, velocidad, vel balas, delay
-240 move 5 60 60 5 normal	;atributos: id, x, y, velocidad(pixel por frame), modo
-250 delete 5
-
+230 enemy 3 6 3 20 5 1 40 		;atributos: x, y, patron, velocidad, vel balas, fraccion, delay
+240 move 5 60 60 5 normal		;atributos: id, x, y, pasos, modo
+250 delete 5					;atributos: id
+260 end							;sin atributos
 
 switch(instruccion):
 	case "enemy":

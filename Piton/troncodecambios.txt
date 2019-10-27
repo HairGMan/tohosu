@@ -15,3 +15,4 @@ Empiezo esto así no nos perdemos
 	-Funciona con complejos asi que esta flama
 -Intente hacer el juego pantalla completa pero no funca por alguna razon, despues le tengo que preguntar al profe
 -Cambiado el nivel de prueba para que sea mas mejor y menos pior
+-Ahora la lista de eventos tiene extension .thi porque pinto

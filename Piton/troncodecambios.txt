@@ -5,3 +5,7 @@ Empiezo esto así no nos perdemos
 -ids de enemigos agregadas
 2do:
 -Pantalla reescalable
+3ro:
+-Animacion de invulnerabilidad (funciona con ifs, si les parece una cagada cambienlo)
+-Las balas estan vectorizadas y se pueden mover menos de 1 pixel por frame
+-La velocidad de balas en los atributos de enemy ahora esta separada en dos: el numero y la fraccion, si es 1 3 por ejemplo la bala se moveria 0.33 pixeles por segundo

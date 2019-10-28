@@ -2,14 +2,14 @@
 11 enemy 130 -30 3 1 30 4 1 30
 12 enemy 130 -30 2 1 60 4 1 30
 13 enemy 130 -30 3 2 50 4 1 30
-24 enemy 215 50 4 1 1 1 1 1
-25 toggle 4 4 1 17
+24 enemy 215 50 4 1 1 3 1 1
+25 switch 4 4 1 34 2
 60 move 0 0 2 90 0
 80 move 1 0 2 90 0
 100 move 2 0 2 90 0
 120 move 3 0 2 90 0
 150 move 0 2 0 90 0
-160 toggle 4 4 2 17
+160 switch 4 4 2 -34 3
 170 move 1 2 0 90 0
 190 move 2 2 0 90 0
 210 move 3 2 0 90 0
@@ -21,7 +21,7 @@
 421 delete 1
 422 delete 2
 423 delete 3
-700 toggle 4 0
+700 switch 4 0
 750 move 4 0 -2 70 0
 820 delete 4
 840 end

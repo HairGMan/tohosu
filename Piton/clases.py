@@ -142,7 +142,7 @@ class Player(pygame.sprite.Sprite):
 		self.image = pygame.image.load("sprites/placehtbxsmall_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
-		self.offset = offy, offx = 2, 2
+		self.offset = offx, offy = 2, 3
 		self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
 		self.invulntime = 0
 		self.init()

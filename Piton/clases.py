@@ -1,4 +1,5 @@
-import pygame, sys
+import pygame, sys, math, cmath
+from math import *
 from cmath import *
 from pygame.locals import *
 pygame.init()
@@ -12,7 +13,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.image = pygame.image.load("sprites/placeenemysmall_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
-		self.offset = offy, offx = 2, 2
+		self.offset = offx, offy = 2, 2
 		self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
 		self.init(startpos)
 		htbxlist.append(self.rect)
@@ -37,7 +38,8 @@ class Enemy(pygame.sprite.Sprite):
 		}
 		self.bulletdict = {
 			1:	BulletA,
-			2:	BulletB
+			2:	BulletB,
+			3:	BulletC
 		}
 		
 	def init(self,startpos):
@@ -124,7 +126,7 @@ class BulletA(Bullet):
 		self.image = pygame.image.load("sprites/bullet4_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
-		self.offset = offy, offx = 2, 2
+		self.offset = offx, offy = 2, 2
 		Bullet.__init__(self,speed,startpos)
 
 class BulletB(Bullet):
@@ -132,7 +134,16 @@ class BulletB(Bullet):
 		self.image = pygame.image.load("sprites/bulletbig3_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-12,-12)
-		self.offset = offy, offx = 6, 6
+		self.offset = offx, offy = 6, 6
+		Bullet.__init__(self,speed,startpos)
+		
+class BulletC(Bullet):
+	def __init__(self,speed,startpos):
+		self.baseimage = pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha()
+		self.image = pygame.transform.rotate(self.baseimage,dirtoangle(*speed))
+		self.rect = self.image.get_rect()
+		self.rect.inflate_ip(-10,-10)
+		self.offset = offx, offy = 5, 5
 		Bullet.__init__(self,speed,startpos)
 		
 class Player(pygame.sprite.Sprite):
@@ -229,6 +240,11 @@ def trackplayer(enemy,player,speed):
 def angletodir(speed,angle):
 	bulletdirection = rect(speed,(angle/180*pi))
 	return bulletdirection.real, bulletdirection.imag
+	
+def dirtoangle(dirx,diry):
+	if dirx == 0: return 90
+	bulletangle = -atan2(diry,dirx) / pi * 180
+	return bulletangle
 	
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE)

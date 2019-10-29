@@ -9,7 +9,7 @@ def haltandcatchfire():
         pygame.mixer.music.stop()
 #        pygame.mixer.music.unload()
         #aca iria alguna manera de llamar al proximo nivel
-        
+		
 #========= Lector de eventos: ==========
 eventdict = {
 	"enemy" :	createenemy,

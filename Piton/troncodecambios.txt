@@ -42,3 +42,8 @@ Empiezo esto así no nos perdemos
 -Ahora el reloj de angulos mueve el angulo cada disparo en vez de cada frame
 -Cambiado toggle por switch
 -Agregado atributo special2 para switch, una segunda variable especifica de patron, en el caso del espiral decide cuantos espirales simultaneos dispara el enemigo
+
+28/10 - 1:
+-Agregados 2 tipos de balas, una es una orbe color meo y la otra es el cosito de los sims
+	-El cosito de los sims tiene rotacion de sprite
+-Agregada dirtoangle(), hace lo mismo que angletodir() pero a la inversa

@@ -39,7 +39,8 @@ class Enemy(pygame.sprite.Sprite):
 		self.bulletdict = {
 			1:	BulletA,
 			2:	BulletB,
-			3:	BulletC
+			3:	BulletC,
+			4:	BulletD
 		}
 		
 	def init(self,startpos):
@@ -144,6 +145,14 @@ class BulletC(Bullet):
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-10,-10)
 		self.offset = offx, offy = 5, 5
+		Bullet.__init__(self,speed,startpos)
+
+class BulletD(Bullet):
+	def __init__(self,speed,startpos):
+		self.image = pygame.image.load("sprites/bullet5_tr.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.inflate_ip(-4,-4)
+		self.offset = offx, offy = 2, 2
 		Bullet.__init__(self,speed,startpos)
 		
 class Player(pygame.sprite.Sprite):

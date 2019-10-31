@@ -43,7 +43,7 @@ pygame.mixer.music.load(nombreNivel + "/musica.wav")
 pygame.mixer.music.play()
 background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
 backgroundoffset = -0.0
-gui = pygame.image.load("sprites/gui_place_choto2_tr.png").convert_alpha()
+gui = pygame.image.load("sprites/gui_place_nochoto_tr.png").convert_alpha()
 
 while 1:
 	clock.tick_busy_loop(60)

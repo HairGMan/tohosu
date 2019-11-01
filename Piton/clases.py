@@ -187,10 +187,7 @@ class Player(pygame.sprite.Sprite):
 			self.rect.x = 200
 			self.rect.y = 300
 			self.invulntime = 150
-			self.lives -= 1
-			if self.lives == 0:
-				gameover()
-
+			
 	def moveup(self):
 		if self.state[1] == 1:
 			self.state[1] = 0
@@ -213,7 +210,7 @@ class Player(pygame.sprite.Sprite):
 		if self.state[0] == -1:
 			self.state[0] = 0
 		else:
-			self.state[0] = 
+			self.state[0] = 1
 
 def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay):
 	startpos = (startposx,startposy)

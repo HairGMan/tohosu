@@ -95,6 +95,7 @@ class Bullet(pygame.sprite.Sprite):
 		self.init(speed,startpos)
 		htbxlist.append(self.rect)
 		self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
+		self.uffeable = True
 		global debugbulletcount
 		debugbulletcount += 1
 	
@@ -164,6 +165,8 @@ class Player(pygame.sprite.Sprite):
 		self.rect.inflate_ip(-4,-4)
 		self.offset = offx, offy = 2, 3
 		self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
+		self.uffhtbx = self.rect.copy()
+		self.uffhtbx.inflate_ip(10,10)
 		self.invulntime = 0
 		self.init()
 		
@@ -178,6 +181,7 @@ class Player(pygame.sprite.Sprite):
 		newpos = self.rect.move(self.movepos)
 		if playrect.contains(newpos):
 			self.rect = newpos
+			self.uffhtbx = newpos.inflate(10,10)
 			self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
 			pygame.event.pump()
 		if not self.invulntime == 0:

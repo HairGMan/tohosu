@@ -38,19 +38,23 @@ framecount = 0
 ev = 0
 
 #========= Runtime: =========
-
-pygame.mixer.music.load(nombreNivel + "/musica2.wav")
-pygame.mixer.music.play()
+pygame.mixer.pre_init(48000,-16,1,1024)
+pygame.mixer.music.load(nombreNivel + "/nice_lvl_3.wav")
+pygame.mixer.music.play(-1)
 background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
 backgroundoffset = 350.0
 score = 3000
 record = 999999999
 uff = 0
 gui = pygame.image.load("sprites/gui_place_nochoto_tr.png").convert_alpha()
+lifesprite = pygame.image.load("sprites/place_life_red2_tr.png").convert_alpha()
 scoretext = font.render("Puntaje", True, (255,255,255))
 scoremeter = font.render(str(score).zfill(10) + "00", True, (255,255,255))
 recordtext = font.render("Record", True, (255,255,255))
 recordamount = font.render(str(record).zfill(10) + "00", True, (255,255,255))
+gameovermask = pygame.Surface((341,340),HWSURFACE)
+gameovermask.fill((0,0,0))
+gameovermask.set_alpha(60)
 
 while 1:
 	clock.tick_busy_loop(60)
@@ -58,6 +62,7 @@ while 1:
 	bulletcountdisp = font.render("Balas:" + str(clases.debugbulletcount), True, (255,255,255))
 	uffmeter = font.render("Uff: " + str(uff), True, (255,255,255))
 	backgroundoffset += 0.05
+	
 	#========= Eventos de teclado: =========
 	
 	for event in pygame.event.get():		
@@ -123,7 +128,11 @@ while 1:
 	screentoscale.blit(scoremeter,(480,60))
 	screentoscale.blit(recordtext,(450,90))
 	screentoscale.blit(recordamount,(480,115))
-	screentoscale.blit(uffmeter,(450,165))
+	screentoscale.blit(uffmeter,(450,180))
+	for i in range(player.lives - 1):
+		screentoscale.blit(lifesprite,(450 + i*20,155))
+	if player.lives == 0:
+		screentoscale.blit(gameovermask,(60,10))
 	screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 	
 	#========= Invulnerabilidad (no se si dejarlo aca) =========

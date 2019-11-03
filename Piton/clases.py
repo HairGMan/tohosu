@@ -58,18 +58,18 @@ class Enemy(pygame.sprite.Sprite):
 		self.shootclock = self.patternspeed
 		
 	def PatternA(self):
-		bullets.append(self.bulletdict[self.bullettype]((0.0,float(self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		bullets.append(self.bulletdict[self.bullettype]((0.0,float(self.bulletspeed)),(float(self.rect.centerx),float(self.rect.centery))))
 		
 	def PatternB(self):
-		bullets.append(self.bulletdict[self.bullettype]([1,self.bulletspeed],(self.rect.x,self.rect.y)))
-		bullets.append(self.bulletdict[self.bullettype]([-1,self.bulletspeed],(self.rect.x,self.rect.y)))
+		bullets.append(self.bulletdict[self.bullettype]([1,self.bulletspeed],self.rect.center))
+		bullets.append(self.bulletdict[self.bullettype]([-1,self.bulletspeed],self.rect.center))
 		
 	def PatternC(self):
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed)),(float(self.rect.x),float(self.rect.y))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed)),(float(self.rect.centerx),float(self.rect.centery))))
 		
 	def PatternD(self):
 		for s in range(self.spirals):
-			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.angleclock+360/self.spirals*s)),(float(self.rect.x),float(self.rect.y))))
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.angleclock+360/self.spirals*s)),(float(self.rect.centerx),float(self.rect.centery))))
 		self.angleclock += self.angleclockint % 360
 
 	def update(self):
@@ -168,6 +168,7 @@ class Player(pygame.sprite.Sprite):
 		self.uffhtbx = self.rect.copy()
 		self.uffhtbx.inflate_ip(10,10)
 		self.invulntime = 0
+		self.lives = 4
 		self.init()
 		
 	def init(self):
@@ -191,6 +192,7 @@ class Player(pygame.sprite.Sprite):
 			self.rect.x = 200
 			self.rect.y = 300
 			self.invulntime = 150
+			self.lives -= 1
 			
 	def moveup(self):
 		if self.state[1] == 1:

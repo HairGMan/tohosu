@@ -47,3 +47,11 @@ Empiezo esto así no nos perdemos
 -Agregados 2 tipos de balas, una es una orbe color meo y la otra es el cosito de los sims
 	-El cosito de los sims tiene rotacion de sprite
 -Agregada dirtoangle(), hace lo mismo que angletodir() pero a la inversa
+
+29/10 - 3/11:
+-Ya fue, logeo esto asi ven como no hice una verga desde hace 5 dias
+-Cambiado el sprite del enemigo por uno con mas detalle
+-Vidas introducidas, 4 vidas antes del game over
+-Si perdes todas las vidas se oscurece la pantalla pero no pasa nada mas
+-Introducido el Uff, mecanica que funciona como el graze, si te acercas a las balas sin morir cada una te da 1 Uff
+-La musica hace loop

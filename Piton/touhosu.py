@@ -2,7 +2,7 @@ import clases
 from clases import *
 
 #========= Que nivel?: ==============
-nombreNivel = "../nivelprueba"
+nombreNivel = "../NivelPrueba"
 
 #========= Funcion de salida:=========
 def haltandcatchfire():
@@ -15,7 +15,7 @@ eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
 	"delete":	delete,
-    "end":		haltandcatchfire,
+        "end":		haltandcatchfire,
 	"switch":	switchshot
 	}
 eventfile = open(nombreNivel + "/eventos.thi","r")
@@ -100,10 +100,14 @@ while 1:
 	
 	#========= Manejo de eventos: =========
 	
-	if ev < eventnum:
-		if framecount == eventlist[ev][0]:
-			eventdict[eventlist[ev][1]](*eventlist[ev][2:])
-			ev += 1
+        if ev < eventnum:
+                while (framecount == eventlist[ev][0]) & (ev+1 < eventnum):
+                        eventdict[eventlist[ev][1]](*eventlist[ev][2:])
+                        print(eventlist[ev][1])
+                        if ev+1 < eventnum:
+                                ev += 1
+        if framecount == 10000:
+                player.image = pygame.image.load("sprites/placekamisama_tr.png").convert_alpha()
 
 	#========= Actualizacion: =========
 	

@@ -1,8 +1,0 @@
-TODOS------juntada en lo de pascu------29/9
- |
- |->Clase para enemigos
- |->Patrón primitivo de balas
-
-===========================================
-
-PASCUAL------prueba de concepto--------26/9

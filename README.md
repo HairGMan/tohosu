@@ -4,19 +4,17 @@
 ==========================================
 
 HASTA AHORA:
-1. "./Piton" contiene todos los archivos
---- El juego es "Piton/prueba1.py"
---- "Piton/clases.py" es la libreria con los objetos
---- "Piton/eventos.txt" es una prueba para el gestor de eventos
-2. "Piton/player" es la carpeta con los archivos de musica y su reproductor
---- El reproductor es "FMPMDE.exe"
---- La musica va a estar en formato PC98 (.m2)
-3. "Touhosu" como juego de palabras entre "Proyecto Touhou" y "Osu!" es un nombre temporal
+1. ./Piton contiene la mayoria de archivos.
+--- El juego es Piton/touhosu.py.
+--- Piton/clases.py es la libreria con los objetos.
+2. "Touhosu" como juego de palabras entre "Proyecto Touhou" y "Osu!" es un nombre temporal.
 
-POSIBLES CAMBIOS:
-1. Los assets van a quedar en una carpeta aparte
---- El codigo tiene que quedar con posiciones relativas
-2. Los niveles van a quedar en carpetas aparte
---- Cada carpeta va a tener su musica, lista de eventos, fondo y sprite de jefe
+COSAS A MODIFICAR:
+1. Añadir efectos de sonido.
+2. Añadir mas enemigos.
+3. Añadir jefes.
 
+El jugador todavia no puede atacar, esto es porque todavia estamos en debate de como hacerlo.
 
+troncodecambios.txt es... el changelog.
+Los eventos estan en un formato inventado con extension .thi, se puede usar el archivo TouhosuInstructions.xml para que notepad++ lo tome como un lenguaje definido por usuario.

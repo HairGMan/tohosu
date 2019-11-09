@@ -1,0 +1,62 @@
+import pygame
+from pygame.locals import *
+
+class Cursor(pygame.Rect):
+	def __init__(self):
+		pygame.Rect.__init__(self,0,0,1,1)
+	def update(self):
+		self.left,self.top=pygame.mouse.get_pos()
+       
+class boton(pygame.sprite.Sprite):
+   def __init__(self,imagen1,imagen2,x=200,y=200):
+	   self.imagen_normal=imagen1
+	   self.imagen_seleccion=imagen2
+	   self.imagen_actual=self.imagen_normal
+	   self.rect=self.imagen_actual.get_rect()
+	   self.rect.left,self.rect.top=(x,y)
+   
+   def update(self,pantalla,cursor): 
+		if cursor.colliderect(self.rect):
+			self.imagen_actual=self.imagen_seleccion
+		else: self.imagen_actual=self.imagen_normal 
+		 
+		 
+		pantalla.blit(self.imagen_actual,self.rect)
+
+
+from pygame.locals import *
+def main():
+	pygame.init()
+
+	pantalla=pygame.display.set_mode((500,400))
+
+	pygame.display.set_caption("fondo")
+	reloj1=pygame.time.Clock()
+	reloj1
+	rojo1=pygame.image.load("jugar1.png")
+	rojo2=pygame.image.load("jugar2.png")
+	boton1=boton(rojo1,rojo2)
+	cursor1=Cursor() 
+	blanco=(225,225,225)
+
+	salir=False
+
+	while salir!=True:
+
+		for event in pygame.event.get():
+
+			if event.type == pygame.QUIT:
+				salir=True 
+		 
+		reloj1.tick(60) 
+		pantalla.fill(blanco)
+		cursor1.update()
+		boton1.update(pantalla,cursor1)
+		
+
+		pygame.display.update()
+
+	pygame.quit()
+
+main()
+ 

@@ -82,6 +82,7 @@ Empiezo esto así no nos perdemos
 		-Punto son los puntos
 		-Carga es la bomba
 		-Extension es el 1up de toda la vida
+			-me quedo medio trambolika la e pero bueno es lo que hay no me pagan lo suficiente
 	-Arreglado el mixer que sonaba para el ojete
 		-A pygame se le ocurre iniciar el mixer con todo lo demas y lo hace para el orto, larga vida a paigeim
 	-Agregado modo debug, se activa con [F4]

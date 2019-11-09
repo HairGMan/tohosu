@@ -9,9 +9,11 @@ currentenemyid = 0
 debugbulletcount = 0
 
 class Item(pygame.sprite.Sprite):
-	def __init__(self,type,startpos):
+	def __init__(self,type,score,startpos):
 		pygame.sprite.Sprite.__init__(self)
 		self.pos = startpos
+		self.score = score
+		self.type = type
 		spritedict = {
 			0: "sprites/item_p_blue_tr.png",
 			1: "sprites/item_p_red_tr.png",
@@ -30,6 +32,13 @@ class Item(pygame.sprite.Sprite):
 			self.vectpos = [self.rect.x,self.rect.y]
 		
 	def collect(self):
+		if self.type == 1:
+			player.power += 1
+		elif self.type == 2:
+			player.charge += 1
+		elif self.type == 3:
+			player.lives += 1
+		player.score += self.score
 		self.delete()
 		return
 		
@@ -231,6 +240,9 @@ class Player(pygame.sprite.Sprite):
 		self.uffhtbx.inflate_ip(10,10)
 		self.invulntime = 0
 		self.lives = 1
+		self.power = 0
+		self.charge = 2
+		self.score = 0
 		self.init()
 		
 	def init(self,lives = 1):
@@ -311,7 +323,7 @@ def switchshot(id,pattern,bullettype = 1,special = 0,special2 = 0):
 				e.spirals = special2
 	
 def trackplayer(enemy,player,speed):
-	distance = complex(float((enemy.rect.x - player.rect.x)),float((enemy.rect.y - player.rect.y)))
+	distance = complex(float((enemy.rect.centerx - player.rect.x)),float((enemy.rect.centery - player.rect.y)))
 	b_phase = phase(distance)
 	bulletdirection = rect(-speed,b_phase)
 	return bulletdirection.real, bulletdirection.imag
@@ -326,7 +338,7 @@ def dirtoangle(dirx,diry):
 	return bulletangle
 	
 size = width, height = 640, 360
-screen = pygame.display.set_mode(size,RESIZABLE)
+screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF)
 screentoscale = screen.copy()
 player = Player()
 area = screen.get_rect()

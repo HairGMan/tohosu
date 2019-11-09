@@ -11,7 +11,7 @@ def gameover(score = 0):
 	gameovermask.set_alpha(60)
 	screentoscale.blit(gameovermask,(60,10))
 	screentoscale.blit(font_bold.render("Fin del juego!", True, (255,255,255)),(120,50))
-	screentoscale.blit(font_bold.render("Puntaje: " + str(score), True, (255,255,255)),(120,80))
+	screentoscale.blit(font_bold.render("Puntaje: " + str(player.score), True, (255,255,255)),(120,80))
 	screenshot = screentoscale.copy()
 	options = [Option("Reiniciar",[120,220],0), Option("Ir al menu",[120,250],1)]
 	options[0].select()
@@ -88,22 +88,21 @@ def level(lives, screen, screentoscale):
 	pygame.mixer.music.play(-1)
 	background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
 	backgroundoffset = 350.0
-	score = 3000
 	record = 999999999
 	uff = 0
 	gui = pygame.image.load("sprites/gui_place_nochoto_tr.png").convert_alpha()
 	lifesprite = pygame.image.load("sprites/place_life_red2_tr.png").convert_alpha()
 	scoretext = font.render("Puntaje", True, (255,255,255))
-	scoremeter = font.render(str(score).zfill(10) + "00", True, (255,255,255))
 	recordtext = font.render("Record", True, (255,255,255))
 	recordamount = font.render(str(record).zfill(10) + "00", True, (255,255,255))
 	player.init(lives)
-	items.append(Item(3,(100,50)))
+	items.append(Item(3,10,(100,50)))
 	while 1:
 		clock.tick_busy_loop(60)
 		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
 		bulletcountdisp = font.render("Balas:" + str(clases.debugbulletcount), True, (255,255,255))
 		uffmeter = font.render("Uff: " + str(uff), True, (255,255,255))
+		scoremeter = font.render(str(player.score).zfill(10) + "00", True, (255,255,255))
 		backgroundoffset += 0.05
 		
 		#========= Eventos de teclado: =========
@@ -148,13 +147,11 @@ def level(lives, screen, screentoscale):
 		
 		#========= Manejo de eventos: =========
 		
-		if ev < eventnum:
-				while (framecount == eventlist[ev][0]) & (ev+1 < eventnum):
-						eventdict[eventlist[ev][1]](*eventlist[ev][2:])
-						if debugmode:
-							print(eventlist[ev][1])
-						if ev+1 < eventnum:
-								ev += 1
+		while (framecount == eventlist[ev][0]) & (ev+1 < eventnum):
+				eventdict[eventlist[ev][1]](*eventlist[ev][2:])
+				if debugmode:
+					print(eventlist[ev][1])
+				ev += 1
 
 		#========= Actualizacion: =========
 		

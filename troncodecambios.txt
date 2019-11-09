@@ -72,3 +72,20 @@ Empiezo esto así no nos perdemos
 
 -Agregado modo Dios
 	-NO AL MODO DIABLO, ¡MODO CRISTO!
+	-No hay chance pa
+	
+-9/11 coincidencia no lo creo - 1:
+	-Agregado game over por fin carajo
+		-momento willy evitado
+	-Agregados items: (P)oder, (P)unto, (C)arga, (E)xtension
+		-Poder es el poder
+		-Punto son los puntos
+		-Carga es la bomba
+		-Extension es el 1up de toda la vida
+	-Arreglado el mixer que sonaba para el ojete
+		-A pygame se le ocurre iniciar el mixer con todo lo demas y lo hace para el orto, larga vida a paigeim
+	-Agregado modo debug, se activa con [F4]
+		-Se muestra el contador de balas
+		-Se imprime en consola el evento actual
+		-Apretando [M] se activa el modo Dios
+	-Movidos los sprites sin transparencia a otra carpeta

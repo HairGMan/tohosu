@@ -2,10 +2,72 @@ import pygame, sys, math, cmath
 from math import *
 from cmath import *
 from pygame.locals import *
+pygame.mixer.init(frequency=44100,buffer=1024)
 pygame.init()
 
 currentenemyid = 0
 debugbulletcount = 0
+
+class Item(pygame.sprite.Sprite):
+	def __init__(self,type,startpos):
+		pygame.sprite.Sprite.__init__(self)
+		self.pos = startpos
+		spritedict = {
+			0: "sprites/item_p_blue_tr.png",
+			1: "sprites/item_p_red_tr.png",
+			2: "sprites/item_c_green_tr.png",
+			3: "sprites/item_1up_tr.png"}
+		self.image = pygame.image.load(spritedict[type]).convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x = self.pos[0]
+		self.rect.y = self.pos[1]
+		self.init(startpos)
+		
+	def init(self,startpos):
+			self.rect.x = startpos[0]
+			self.rect.y = startpos[1]
+			self.movepos = (0,2)
+			self.vectpos = [self.rect.x,self.rect.y]
+		
+	def collect(self):
+		self.delete()
+		return
+		
+	def update(self):
+		self.vectpos[0] += self.movepos[0]
+		self.vectpos[1] += self.movepos[1]
+		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
+		pygame.event.pump()
+		if not bulletliferect.contains(self.rect):
+			self.delete()
+		if self.rect.colliderect(player.rect):
+			self.collect()
+			
+	def delete(self):
+		items.remove(self)
+
+class Option():
+	def __init__(self,string,pos,id):
+		self.string = string
+		self.pos = pos
+		self.selected = False
+		self.color = (255,255,255)
+		self.id = id
+		
+	def select(self):
+		if not self.selected:
+			self.pos[0] += 20
+			self.selected = not self.selected
+			self.color = (128,255,128)
+		
+	def deselect(self):
+		if self.selected:
+			self.pos[0] -= 20
+			self.selected = not self.selected
+			self.color = (255,255,255)
+	
+	def render(self):
+		return font.render(self.string, True, self.color)
 
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self,startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay):
@@ -168,14 +230,16 @@ class Player(pygame.sprite.Sprite):
 		self.uffhtbx = self.rect.copy()
 		self.uffhtbx.inflate_ip(10,10)
 		self.invulntime = 0
-		self.lives = 4
+		self.lives = 1
 		self.init()
 		
-	def init(self):
-		self.rect.x = 200
+	def init(self,lives = 1):
+		self.rect.x = 230
 		self.rect.y = 300
 		self.state = [0,0,3]
 		self.movepos = [0,0]
+		self.invulntime = 0
+		self.lives = lives
 
 	def update(self):
 		self.movepos = [(self.state[0] * self.state[2]),(self.state[1] * self.state[2])]
@@ -189,7 +253,7 @@ class Player(pygame.sprite.Sprite):
 			self.invulntime -= 1
 			
 	def hit(self):
-			self.rect.x = 200
+			self.rect.x = 230
 			self.rect.y = 300
 			self.invulntime = 150
 			self.lives -= 1
@@ -269,6 +333,9 @@ area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
 font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
+font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
+font_bold.set_bold(True)
 bullets = list()
-htbxlist = list()
 enemies = list()
+items = list()
+htbxlist = list()

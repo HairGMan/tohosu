@@ -99,3 +99,10 @@ Empiezo esto así no nos perdemos
 	-Arreglados un par de bugs
 	-Actualizados los archivos de localizacion
 	-Si muero mañana entierrenme con mi teclado y quemen toda evidencia de que en vida programe en python
+	
+-11/11 - 2:
+	-Agregada clase Particle(), diferentes tipos de particulas
+		-Agregada particula CollectParticle, te indica lo que recibis (puntaje, +1 vida, +1 carga, etc)
+			-Tiene una animacion copada
+	-Agregada funcion die() para los enemigos, lo mata y te dropea cosas y puntaje
+		-Si apretas [Z] muere un enemigo al azar, era nomas para probar

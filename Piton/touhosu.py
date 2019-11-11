@@ -170,6 +170,9 @@ def level(lives, screen, screentoscale):
 		for i in items:
 			i.update()
 			screentoscale.blit(i.image, i.rect)
+		for i in particles:
+			i.update()
+			screentoscale.blit(i.image, i.rect)
 		for i in bullets:
 			i.update()
 			if player.invulntime == 0:

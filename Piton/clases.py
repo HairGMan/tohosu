@@ -9,6 +9,35 @@ pygame.init()
 currentenemyid = 0
 debugbulletcount = 0
 
+class Particle(pygame.sprite.Sprite):
+	def __init__(self,startpos):
+		pygame.sprite.Sprite.__init__(self)
+		self.rect = self.image.get_rect()
+		self.rect.move_ip(startpos)
+		self.vectpos = [self.rect.x,self.rect.y]
+		
+	def update(self):
+		self.vectpos[0] += self.movepos[0]
+		self.vectpos[1] += self.movepos[1]
+		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
+		self.duration -= 1
+		if self.duration == 0:
+			self.delete()
+		
+	def delete(self):
+		particles.remove(self)
+		
+class CollectParticle(Particle):
+	def __init__(self,drop,startpos):
+		self.image = font_small.render(drop,True,(255,255,255))
+		self.duration = 60
+		self.movepos = [0.0,-2.0]
+		Particle.__init__(self,startpos)
+		
+	def update(self):
+		self.movepos[1] = self.movepos[1] * self.duration / 60
+		Particle.update(self)
+
 class Cursor(pygame.Rect):
 	def __init__(self):
 		pygame.Rect.__init__(self,0,0,1,1)
@@ -33,6 +62,7 @@ class Item(pygame.sprite.Sprite):
 		
 	def collect(self):
 		player.score += self.score
+		particles.append(CollectParticle(self.dropstring,self.rect.center))
 		self.delete()
 		return
 		
@@ -53,6 +83,7 @@ class ItemPower(Item):
 	def __init__(self,startpos):
 		self.image = pygame.image.load("sprites/item_p_red_tr.png").convert_alpha()
 		self.score = 2
+		self.dropstring = "+1"
 		Item.__init__(self,startpos)
 		
 	def collect(self):
@@ -63,6 +94,7 @@ class ItemPoint(Item):
 	def __init__(self,startpos):
 		self.image = pygame.image.load("sprites/item_p_blue_tr.png").convert_alpha()
 		self.score = 10
+		self.dropstring = str(self.score*100)
 		Item.__init__(self,startpos)
 		
 	def collect(self):
@@ -72,6 +104,7 @@ class ItemCharge(Item):
 	def __init__(self,startpos):
 		self.image = pygame.image.load("sprites/item_c_green_tr.png").convert_alpha()
 		self.score = 20
+		self.dropstring = "Carga"
 		Item.__init__(self,startpos)
 		
 	def collect(self):
@@ -82,6 +115,7 @@ class ItemExtend(Item):
 	def __init__(self,startpos):
 		self.image = pygame.image.load("sprites/item_1up_tr.png").convert_alpha()
 		self.score = 20
+		self.dropstring = "1UP"
 		Item.__init__(self,startpos)
 		
 	def collect(self):
@@ -190,6 +224,7 @@ class Enemy(pygame.sprite.Sprite):
 
 	def die(self):
 		items.append(self.dropdict[self.drop](self.rect.center))
+		particles.append(CollectParticle(str(self.killpoint*100),self.rect.center))
 		player.score += self.killpoint
 		self.delete()
 
@@ -395,9 +430,11 @@ area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
 font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
+font_small = pygame.font.Font("sprites/MSGOTHIC.TTC", 10)
 font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
 font_bold.set_bold(True)
 bullets = list()
 enemies = list()
 items = list()
+particles = list()
 htbxlist = list()

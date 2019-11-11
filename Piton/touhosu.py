@@ -77,13 +77,15 @@ eventnum = len(eventlist)
 #========= Frames, eventos: =========
 clock = pygame.time.Clock()
 clock
+debugmode = False
 
 #========= Runtime: =========
 
 def level(lives, screen, screentoscale):
-	debugmode = False
+	global debugmode
 	framecount = 0
 	ev = 0
+	eventend = False
 	pygame.mixer.music.load(nombreNivel + "/nice_lvl_3.wav")
 	pygame.mixer.music.play(-1)
 	background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
@@ -96,7 +98,6 @@ def level(lives, screen, screentoscale):
 	recordtext = font.render("Record", True, (255,255,255))
 	recordamount = font.render(str(record).zfill(10) + "00", True, (255,255,255))
 	player.init(lives)
-	items.append(Item(3,10,(100,50)))
 	while 1:
 		clock.tick_busy_loop(60)
 		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
@@ -124,6 +125,9 @@ def level(lives, screen, screentoscale):
 						player.moveleft()
 				elif event.key == pygame.K_RIGHT:
 						player.moveright()
+				elif event.key == pygame.K_z:
+						if len(enemies):
+							choice(enemies).die()
 				if event.key == pygame.K_F4:
 					debugmode = not debugmode
 				if event.key == pygame.K_m:
@@ -146,12 +150,16 @@ def level(lives, screen, screentoscale):
 		screentoscale.blit(background, (0, - background.get_height() + backgroundoffset))
 		
 		#========= Manejo de eventos: =========
-		
-		while (framecount == eventlist[ev][0]) & (ev+1 < eventnum):
-				eventdict[eventlist[ev][1]](*eventlist[ev][2:])
-				if debugmode:
-					print(eventlist[ev][1])
+	
+		while (framecount == eventlist[ev][0]) & (ev < eventnum) & (eventend == False):
+			eventdict[eventlist[ev][1]](*eventlist[ev][2:])
+			if debugmode:
+				print str(ev) + " de " + str(eventnum) + ":"
+				print(eventlist[ev][1:])
+			if ev+1 < eventnum:
 				ev += 1
+			else:
+				eventend = True
 
 		#========= Actualizacion: =========
 		
@@ -188,11 +196,13 @@ def level(lives, screen, screentoscale):
 			screentoscale.blit(lifesprite,(450 + i*20,155))
 			
 		if player.lives == 0:
-			gameoveroption = gameover(score)
+			gameoveroption = gameover(player.score)
 			for i in reversed(xrange(len(enemies))):
 				enemies[i].delete()
 			for i in reversed(xrange(len(bullets))):
 				bullets[i].delete()
+			for i in reversed(xrange(len(items))):
+				items[i].delete()
 			clases.currentenemyid = 0
 			return gameoveroption
 			

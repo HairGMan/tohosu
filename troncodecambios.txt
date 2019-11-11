@@ -90,3 +90,11 @@ Empiezo esto así no nos perdemos
 		-Se imprime en consola el evento actual
 		-Apretando [M] se activa el modo Dios
 	-Movidos los sprites sin transparencia a otra carpeta
+
+-11/11 - 1 (Deberia estar estudiando me van a giancholar):
+	-Agregado patron nuevo: PatternRandom, tira una o mas balas para cualquier lado
+		-Cambiado enemy.spirals por enemy.patterninstances para hacerlo mas general
+	-Renombrados todos los patrones, ahora indican mejor lo que hace cada uno
+	-Arreglados un par de bugs
+	-Actualizados los archivos de localizacion
+	-Si muero mañana entierrenme con mi teclado y quemen toda evidencia de que en vida programe en python

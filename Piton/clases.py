@@ -155,7 +155,7 @@ class Option():
 		return font.render(self.string, True, self.color)
 
 class Enemy(pygame.sprite.Sprite):
-	def __init__(self,startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop,killpoint):
+	def __init__(self,startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("sprites/placeenemysmall_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
@@ -172,7 +172,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.patternspeed = patternspeed
 		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
 		self.drop = drop
-		self.health = 15
+		self.health = health
 		self.killpoint = killpoint
 		global currentenemyid
 		self.id = currentenemyid
@@ -332,7 +332,7 @@ class BulletFriendly(Bullet):
 		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		friendlyhtbxlist.append(self.rect)
-		self.init(speed,player.rect)
+		self.init(speed,(player.rect.centerx-self.rect.centerx,player.rect.top))
 		self.imgpos = self.rect
 		global debugbulletcount
 		debugbulletcount += 1
@@ -447,9 +447,9 @@ class Player(pygame.sprite.Sprite):
 			friendlybullets.append(BulletFriendly((-0.5,-6)))
 			self.shootclock = 5
 			
-def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop = 1,killpoint = 300):
+def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health = 15,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
-	enemies.append(Enemy(startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop,killpoint))
+	enemies.append(Enemy(startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
 	return
 
 def move(id,x,y,steps,mode):

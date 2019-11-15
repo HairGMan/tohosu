@@ -115,6 +115,12 @@ Empiezo esto así no nos perdemos
 		-Agregado menú de pausa con 3 opciones: reanudar, reiniciar y volver al menú
 		-Ahora el juego soporta unicode
 
-14/11 - 2:
-	-Arreglado un bug que trababa las teclas al perder
-	-Me olvide de poner que ahora el juego empieza en pantalla completa
+Cosas que hacer:
+	-Meter barra de poder (yo diria que con límite de 64 esta flama)
+	-Meter niveles de poder (3 o 4)
+	-Meter laseres
+	-Meter puntajes record (una lista de puntajes con nombres que se actualize si el jugador rompe el record)
+	-Diseñar niveles
+	-Diseñar y agregar las cargas (bombas)
+	-Hacer una documentacion/referencia del .thi porque los enemigos ya tienen 12 variables y es un quilombo
+Elijan cualquier cosa de esto o sino hagan lo que se les cante el ojete

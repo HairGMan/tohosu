@@ -44,6 +44,15 @@ class Cursor(pygame.Rect):
 		
 	def update(self):
 		self.left,self.top=pygame.mouse.get_pos()
+		
+class SparkParticle(Particle):
+	def __init__(self,startpos,color):
+		self.color = color
+		self.image = pygame.Surface((4,4))
+		self.image.fill(self.color)
+		self.duration = 20
+		self.movepos = angletodir(uniform(2,3),uniform(0,360))
+		Particle.__init__(self,startpos)
 
 class Item(pygame.sprite.Sprite):
 	def __init__(self,startpos):
@@ -93,8 +102,8 @@ class ItemPower(Item):
 class ItemPoint(Item):
 	def __init__(self,startpos):
 		self.image = pygame.image.load("sprites/item_p_blue_tr.png").convert_alpha()
-		self.score = 10
-		self.dropstring = str(self.score*100)
+		self.score = 100
+		self.dropstring = str(self.score*10)
 		Item.__init__(self,startpos)
 		
 	def collect(self):
@@ -154,6 +163,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.init(startpos)
 		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
 		htbxlist.append(self.rect)
+		enemyhtbxlist.append(self.rect)
 		self.movepos = (0,0)
 		self.moveclock = 0
 		self.shootclock = delay
@@ -162,6 +172,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.patternspeed = patternspeed
 		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
 		self.drop = drop
+		self.health = 15
 		self.killpoint = killpoint
 		global currentenemyid
 		self.id = currentenemyid
@@ -224,7 +235,9 @@ class Enemy(pygame.sprite.Sprite):
 
 	def die(self):
 		items.append(self.dropdict[self.drop](self.rect.center))
-		particles.append(CollectParticle(str(self.killpoint*100),self.rect.center))
+		particles.append(CollectParticle(str(self.killpoint*10),self.rect.center))
+		for i in range(15):
+			particles.append(SparkParticle(self.rect.center,(225,225,255)))
 		player.score += self.killpoint
 		self.delete()
 
@@ -237,6 +250,8 @@ class Enemy(pygame.sprite.Sprite):
 			self.movepos = (0,0)
 		else:
 			self.moveclock -= 1
+		if self.health <= 0:
+			self.die()
 		self.rect.move_ip(self.movepos)
 		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
 		pygame.event.pump()
@@ -245,6 +260,8 @@ class Enemy(pygame.sprite.Sprite):
 		enemies.remove(self)
 		if self.rect in htbxlist:
 			htbxlist.remove(self.rect)
+		if self.rect in enemyhtbxlist:
+			enemyhtbxlist.remove(self.rect)
 		
 class Bullet(pygame.sprite.Sprite):
 	def __init__(self,speed,startpos):
@@ -309,6 +326,39 @@ class BulletD(Bullet):
 		self.rect.inflate_ip(-4,-4)
 		Bullet.__init__(self,speed,startpos)
 		
+class BulletFriendly(Bullet):
+	def __init__(self,speed):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		friendlyhtbxlist.append(self.rect)
+		self.init(speed,player.rect)
+		self.imgpos = self.rect
+		global debugbulletcount
+		debugbulletcount += 1
+		
+	def update(self):
+		self.vectpos[0] += self.movepos[0]
+		self.vectpos[1] += self.movepos[1]
+		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
+		self.imgpos = self.rect
+		pygame.event.pump()
+		if not bulletliferect.contains(self.rect):
+			self.delete()
+		elif self.rect.collidelist(enemyhtbxlist) != -1:
+			enemies[self.rect.collidelist(enemyhtbxlist)].health -= 1
+			player.score += 1
+			self.delete()
+			
+	def delete(self):
+		friendlybullets.remove(self)
+		if self.rect in friendlyhtbxlist:
+			friendlyhtbxlist.remove(self.rect)
+		
+	def __del__(self):
+		global debugbulletcount
+		debugbulletcount -= 1
+	
 class Player(pygame.sprite.Sprite):
 	
 	def __init__(self):
@@ -325,6 +375,8 @@ class Player(pygame.sprite.Sprite):
 		self.power = 0
 		self.charge = 2
 		self.score = 0
+		self.shootclock = 5
+		self.debuginvincible = False
 		self.init()
 		
 	def init(self,lives = 1):
@@ -376,8 +428,16 @@ class Player(pygame.sprite.Sprite):
 			self.state[0] = 0
 		else:
 			self.state[0] = 1
-
-def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop = 1,killpoint = 30):
+	
+	def shoot(self):
+		self.shootclock -= 1
+		if self.shootclock == 0:
+			friendlybullets.append(BulletFriendly((0,-6)))
+			friendlybullets.append(BulletFriendly((0.5,-6)))
+			friendlybullets.append(BulletFriendly((-0.5,-6)))
+			self.shootclock = 5
+			
+def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
 	enemies.append(Enemy(startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,drop,killpoint))
 	return
@@ -423,8 +483,9 @@ def dirtoangle(dirx,diry):
 	return bulletangle
 	
 size = width, height = 640, 360
-screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF)
+screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
+screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 player = Player()
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
@@ -435,6 +496,9 @@ font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
 font_bold.set_bold(True)
 bullets = list()
 enemies = list()
+enemyhtbxlist = list()
 items = list()
 particles = list()
 htbxlist = list()
+friendlybullets = list()
+friendlyhtbxlist = list()

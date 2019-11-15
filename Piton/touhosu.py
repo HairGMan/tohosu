@@ -179,6 +179,17 @@ def level(lives, screen, screentoscale):
 					pauseoption = pause()
 					if pauseoption == 0:
 						pygame.mixer.music.unpause()
+						player.state = [0,0,3]
+						if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+							self.state[2] = 1
+						if pygame.key.get_pressed()[pygame.K_UP]:
+							self.moveup()
+						if pygame.key.get_pressed()[pygame.K_DOWN]:
+							self.movedown()
+						if pygame.key.get_pressed()[pygame.K_LEFT]:
+							self.moveleft()
+						if pygame.key.get_pressed()[pygame.K_RIGHT]:
+							self.moveright()
 					else:
 						for i in reversed(xrange(len(enemies))):
 							enemies[i].delete()

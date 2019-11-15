@@ -114,3 +114,7 @@ Empiezo esto así no nos perdemos
 		-Ahora se muestra la cantidad de cargas en el GUI (espiral naranja), todavia no hacen nada
 		-Agregado menú de pausa con 3 opciones: reanudar, reiniciar y volver al menú
 		-Ahora el juego soporta unicode
+
+14/11 - 2:
+	-Arreglado un bug que trababa las teclas al perder
+	-Me olvide de poner que ahora el juego empieza en pantalla completa

@@ -238,20 +238,20 @@ class Enemy(pygame.sprite.Sprite):
 			
 	def PatternTrack1(self):
 		for s in range(self.patterninstances - 1):
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed)),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation)),(float(self.rect.centerx),float(self.rect.centery))))
 	
 	def PatternTrack2(self):
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
 		for s in range(self.patterninstances - 1):
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
 			
 	def PatternSpiral(self):
 		for s in range(self.patterninstances):
-			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.angleclock+360/self.patterninstances*s)),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation+self.angleclock+360/self.patterninstances*s)),(float(self.rect.centerx),float(self.rect.centery))))
 		self.angleclock += self.angleinterval % 360
 	
 	def PatternRandom(self):

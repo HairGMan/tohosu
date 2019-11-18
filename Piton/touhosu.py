@@ -99,6 +99,20 @@ def haltandcatchfire():
 #        pygame.mixer.music.unload()
         #aca iria alguna manera de llamar al proximo nivel
 		
+def mandatodoalcarajo():
+	for i in reversed(xrange(len(enemies))):
+		enemies[i].delete()
+	for i in reversed(xrange(len(bullets))):
+		bullets[i].delete()
+	for i in reversed(xrange(len(items))):
+		items[i].delete()
+	for i in reversed(xrange(len(friendlybullets))):
+		friendlybullets[i].delete()
+	for i in charges:
+		i.delete()
+	clases.currentenemyid = 0
+	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
+
 #========= Lector de eventos: ==========
 eventdict = {
 	"enemy" :	createenemy,
@@ -126,6 +140,7 @@ clock
 debugmode = False
 
 #========= Runtime: =========
+debugenemycount = 0
 
 def level(lives, screen, screentoscale):
 	pygame.mouse.set_visible(False)
@@ -149,10 +164,11 @@ def level(lives, screen, screentoscale):
 	while 1:
 		clock.tick_busy_loop(60)
 		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
-		bulletcountdisp = font.render("Balas:" + str(clases.debugbulletcount), True, (255,255,255))
+		bulletcountdisp = font.render("Balas:" + str(len(bullets)+len(friendlybullets)), True, (255,255,255))
+		enemycountdisp = font.render("Enemigos:" + str(len(enemies)), True, (255,255,255))
 		uffmeter = font.render("Uff: " + str(uff), True, (255,255,255))
 		scoremeter = font.render(str(player.score).zfill(11) + "0", True, (255,255,255))
-		backgroundoffset += 0.05
+		backgroundoffset += 0.1
 		
 		#========= Eventos de teclado: =========
 		
@@ -175,32 +191,25 @@ def level(lives, screen, screentoscale):
 						player.moveright()
 				elif event.key == pygame.K_z:
 						player.shootclock = 1
+				elif event.key == pygame.K_x:
+						player.shootcharge()
 				elif event.key == pygame.K_ESCAPE:
 					pauseoption = pause()
 					if pauseoption == 0:
 						pygame.mixer.music.unpause()
 						player.state = [0,0,3]
 						if pygame.key.get_pressed()[pygame.K_LSHIFT]:
-							self.state[2] = 1
+							player.state[2] = 1
 						if pygame.key.get_pressed()[pygame.K_UP]:
-							self.moveup()
+							player.moveup()
 						if pygame.key.get_pressed()[pygame.K_DOWN]:
-							self.movedown()
+							player.movedown()
 						if pygame.key.get_pressed()[pygame.K_LEFT]:
-							self.moveleft()
+							player.moveleft()
 						if pygame.key.get_pressed()[pygame.K_RIGHT]:
-							self.moveright()
+							player.moveright()
 					else:
-						for i in reversed(xrange(len(enemies))):
-							enemies[i].delete()
-						for i in reversed(xrange(len(bullets))):
-							bullets[i].delete()
-						for i in reversed(xrange(len(items))):
-							items[i].delete()
-						for i in reversed(xrange(len(friendlybullets))):
-							friendlybullets[i].delete()
-						clases.currentenemyid = 0
-						player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
+						mandatodoalcarajo()
 						return (pauseoption - 1)
 				elif event.key == pygame.K_F4:
 					debugmode = not debugmode
@@ -235,7 +244,7 @@ def level(lives, screen, screentoscale):
 		while (framecount == eventlist[ev][0]) & (ev < eventnum) & (eventend == False):
 			eventdict[eventlist[ev][1]](*eventlist[ev][2:])
 			if debugmode:
-				print str(ev) + " de " + str(eventnum) + ":"
+				print str(ev+1) + " de " + str(eventnum) + ":"
 				print(eventlist[ev][1:])
 			if ev+1 < eventnum:
 				ev += 1
@@ -257,6 +266,9 @@ def level(lives, screen, screentoscale):
 		for i in friendlybullets:
 			i.update()
 			screentoscale.blit(i.image, i.rect)
+		for i in charges:
+			i.update()
+			screentoscale.blit(i.chargemask,(60,10))
 		for i in bullets:
 			i.update()
 			if player.invulntime == 0:
@@ -273,6 +285,7 @@ def level(lives, screen, screentoscale):
 		screentoscale.blit(fps, (2,0))
 		if debugmode:
 			screentoscale.blit(bulletcountdisp, (screentoscale.get_width() - bulletcountdisp.get_width(),screentoscale.get_height() - bulletcountdisp.get_height()))
+			screentoscale.blit(enemycountdisp, (screentoscale.get_width() - enemycountdisp.get_width(),screentoscale.get_height() - enemycountdisp.get_height() - 20))
 		screentoscale.blit(scoretext,(450,35))
 		screentoscale.blit(scoremeter,(480,60))
 		screentoscale.blit(recordtext,(450,90))
@@ -288,14 +301,7 @@ def level(lives, screen, screentoscale):
 			
 		if player.lives == 0:
 			gameoveroption = gameover()
-			for i in reversed(xrange(len(enemies))):
-				enemies[i].delete()
-			for i in reversed(xrange(len(bullets))):
-				bullets[i].delete()
-			for i in reversed(xrange(len(items))):
-				items[i].delete()
-			clases.currentenemyid = 0
-			player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
+			mandatodoalcarajo()
 			return gameoveroption
 			
 		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))

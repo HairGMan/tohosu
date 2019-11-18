@@ -124,3 +124,16 @@ Cosas que hacer:
 	-Diseñar y agregar las cargas (bombas)
 	-Hacer una documentacion/referencia del .thi porque los enemigos ya tienen 12 variables y es un quilombo
 Elijan cualquier cosa de esto o sino hagan lo que se les cante el ojete
+
+-15/11 - 18/11:
+	-Las cargas funcan
+		-Es un rayo que mata a todos los enemigos
+		-Funca con la clase Charge(), le hice una lista aunque solo pueda haber uno por vez, medio feo pero eh
+	-El modo debug ahora muestra tambien la cantidad de enemigos
+	-Agregada bala pequeña
+	-Agregados una banda de patrones
+		-Son 6 patrones en total, si los modificas podes hacer literalmente cualquier cosa
+		-Tienen 9 variables cada uno, la documentacion lo explica todo, no me maten
+		-Si se bancan 1 variable mas les queria hacer colores a las balas
+	-Creada documentacion para el formato de eventos
+	-Alguna otra boludez mas habre hecho

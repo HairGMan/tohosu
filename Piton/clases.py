@@ -7,7 +7,6 @@ pygame.mixer.init(frequency=44100,buffer=1024)
 pygame.init()
 
 currentenemyid = 0
-debugbulletcount = 0
 
 class Particle(pygame.sprite.Sprite):
 	def __init__(self,startpos):
@@ -26,6 +25,7 @@ class Particle(pygame.sprite.Sprite):
 		
 	def delete(self):
 		particles.remove(self)
+		del self
 		
 class CollectParticle(Particle):
 	def __init__(self,drop,startpos):
@@ -53,7 +53,7 @@ class SparkParticle(Particle):
 		self.duration = 20
 		self.movepos = angletodir(uniform(2,3),uniform(0,360))
 		Particle.__init__(self,startpos)
-
+		
 class Item(pygame.sprite.Sprite):
 	def __init__(self,startpos):
 		pygame.sprite.Sprite.__init__(self)
@@ -82,11 +82,12 @@ class Item(pygame.sprite.Sprite):
 		pygame.event.pump()
 		if not bulletliferect.contains(self.rect):
 			self.delete()
-		if self.rect.colliderect(player.rect):
+		if self.rect.colliderect(player.uffhtbx):
 			self.collect()
 			
 	def delete(self):
 		items.remove(self)
+		del self
 		
 class ItemPower(Item):
 	def __init__(self,startpos):
@@ -105,9 +106,6 @@ class ItemPoint(Item):
 		self.score = 100
 		self.dropstring = str(self.score*10)
 		Item.__init__(self,startpos)
-		
-	def collect(self):
-		Item.collect(self)
 		
 class ItemCharge(Item):
 	def __init__(self,startpos):
@@ -155,43 +153,54 @@ class Option():
 		return font.render(self.string, True, self.color)
 
 class Enemy(pygame.sprite.Sprite):
-	def __init__(self,startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint):
+	def __init__(self,startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("sprites/placeenemysmall_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		self.init(startpos)
-		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
+		self.imagecenter = [self.image.get_width()/2, self.image.get_height()/2]
+		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		htbxlist.append(self.rect)
 		enemyhtbxlist.append(self.rect)
 		self.movepos = (0,0)
 		self.moveclock = 0
+		
+		#=======Variables del patron=======
+		
 		self.shootclock = delay
 		self.pattern = pattern
 		self.bullettype = bullettype
 		self.patternspeed = patternspeed
 		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
+		self.patternrotation = rotation
+		self.angleinterval = float(angleinterval)
+		
+		#=======Variables del enemigo======
+		
 		self.drop = drop
 		self.health = health
 		self.killpoint = killpoint
 		global currentenemyid
 		self.id = currentenemyid
+		
 		currentenemyid += 1
 		self.angleclock = 0.0
-		self.angleclockint = 0.0
-		self.patterninstances = 1
+		self.patterninstances = instances
 		self.patterndict = {
 			1:	self.Pattern1Bullet,
 			2:	self.Pattern2Bullets,
 			3:	self.PatternTrack1,
-			4:	self.PatternSpiral,
-			5:	self.PatternRandom
+			4:	self.PatternTrack2,
+			5:	self.PatternSpiral,
+			6:	self.PatternRandom
 		}
 		self.bulletdict = {
 			1:	BulletA,
 			2:	BulletB,
 			3:	BulletC,
-			4:	BulletD
+			4:	BulletD,
+			5:	BulletE
 		}
 		self.dropdict = {
 			1:	ItemPoint,
@@ -215,19 +224,35 @@ class Enemy(pygame.sprite.Sprite):
 		self.shootclock = self.patternspeed
 		
 	def Pattern1Bullet(self):
-		bullets.append(self.bulletdict[self.bullettype]((0.0,float(self.bulletspeed)),(float(self.rect.centerx),float(self.rect.centery))))
-		
+		for s in range(self.patterninstances - 1):
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation+self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation)),(float(self.rect.centerx),float(self.rect.centery))))
+
 	def Pattern2Bullets(self):
-		bullets.append(self.bulletdict[self.bullettype]([1,self.bulletspeed],self.rect.center))
-		bullets.append(self.bulletdict[self.bullettype]([-1,self.bulletspeed],self.rect.center))
-		
+		for s in range(self.patterninstances - 1):
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation+self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.patternrotation-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype](angletodir(self.bulletspeed,self.patternrotation+self.angleinterval/2),self.rect.center))
+		bullets.append(self.bulletdict[self.bullettype](angletodir(self.bulletspeed,self.patternrotation-self.angleinterval/2),self.rect.center))
+			
 	def PatternTrack1(self):
+		for s in range(self.patterninstances - 1):
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
 		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed)),(float(self.rect.centerx),float(self.rect.centery))))
-		
+	
+	def PatternTrack2(self):
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		for s in range(self.patterninstances - 1):
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			
 	def PatternSpiral(self):
 		for s in range(self.patterninstances):
 			bullets.append(self.bulletdict[self.bullettype]((angletodir(self.bulletspeed,self.angleclock+360/self.patterninstances*s)),(float(self.rect.centerx),float(self.rect.centery))))
-		self.angleclock += self.angleclockint % 360
+		self.angleclock += self.angleinterval % 360
 	
 	def PatternRandom(self):
 		for s in range(self.patterninstances):
@@ -253,25 +278,23 @@ class Enemy(pygame.sprite.Sprite):
 		if self.health <= 0:
 			self.die()
 		self.rect.move_ip(self.movepos)
-		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
+		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		pygame.event.pump()
 		
 	def delete(self):
 		enemies.remove(self)
-		if self.rect in htbxlist:
-			htbxlist.remove(self.rect)
-		if self.rect in enemyhtbxlist:
-			enemyhtbxlist.remove(self.rect)
+		htbxlist.remove(self.rect)
+		enemyhtbxlist.remove(self.rect)
+		del self
 		
 class Bullet(pygame.sprite.Sprite):
 	def __init__(self,speed,startpos):
 		pygame.sprite.Sprite.__init__(self)
 		self.init(speed,startpos)
-		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
+		self.imagecenter = [self.image.get_width()/2, self.image.get_height()/2]
+		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		htbxlist.append(self.rect)
 		self.uffeable = True
-		global debugbulletcount
-		debugbulletcount += 1
 	
 	def init(self,speed,startpos):
 		self.rect.x = startpos[0]
@@ -283,19 +306,16 @@ class Bullet(pygame.sprite.Sprite):
 		self.vectpos[0] += self.movepos[0]
 		self.vectpos[1] += self.movepos[1]
 		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
-		self.imgpos = (self.rect.centerx - self.image.get_width()/2,self.rect.centery - self.image.get_height()/2)
+		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		pygame.event.pump()
 		if not bulletliferect.contains(self.rect):
 			self.delete()
 		
 	def delete(self):
-		bullets.remove(self)
 		if self.rect in htbxlist:
 			htbxlist.remove(self.rect)
-		
-	def __del__(self):
-		global debugbulletcount
-		debugbulletcount -= 1
+		bullets.remove(self)
+		del self
 		
 class BulletA(Bullet):
 	def __init__(self,speed,startpos):
@@ -325,6 +345,12 @@ class BulletD(Bullet):
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		Bullet.__init__(self,speed,startpos)
+
+class BulletE(Bullet):
+	def __init__(self,speed,startpos):
+		self.image = pygame.image.load("sprites/bulletsmol_tr.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		Bullet.__init__(self,speed,startpos)
 		
 class BulletFriendly(Bullet):
 	def __init__(self,speed):
@@ -334,8 +360,6 @@ class BulletFriendly(Bullet):
 		friendlyhtbxlist.append(self.rect)
 		self.init(speed,(player.rect.centerx-self.rect.centerx,player.rect.top))
 		self.imgpos = self.rect
-		global debugbulletcount
-		debugbulletcount += 1
 		
 	def update(self):
 		self.vectpos[0] += self.movepos[0]
@@ -351,23 +375,47 @@ class BulletFriendly(Bullet):
 			self.delete()
 			
 	def delete(self):
-		friendlybullets.remove(self)
 		if self.rect in friendlyhtbxlist:
 			friendlyhtbxlist.remove(self.rect)
+		friendlybullets.remove(self)
+		del self
 		
-	def __del__(self):
-		global debugbulletcount
-		debugbulletcount -= 1
+class Charge(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		self.chargemask = pygame.Surface((340,340),SRCALPHA,32)
+		self.chargemask.convert_alpha()
+		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
+		self.duration = 10
+		self.locate()
+		
+	def locate(self):
+		if len(enemies) != 0:
+			for h in enemyhtbxlist:
+				self.thunderpoints.append((h.centerx-60,h.centery-10))
+			pygame.draw.lines(self.chargemask,(255,255,0),False,self.thunderpoints,4)
+			for e in reversed(xrange(len(enemies))):
+				enemies[e].die()
+				player.score += 100
+			
+	def update(self):
+		pygame.event.pump()
+		self.duration -= 1
+		if self.duration == 0:
+			self.delete()
 	
+	def delete(self):
+		charges.remove(self)
+		
 class Player(pygame.sprite.Sprite):
 	
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("sprites/placehtbxsmall_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
-		self.rect.inflate_ip(-4,-4)
-		self.offset = offx, offy = 2, 3
-		self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
+		self.rect.inflate_ip(-8,-8)
+		self.imagecenter = [self.image.get_width()/2, self.image.get_height()/2]
+		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		self.uffhtbx = self.rect.copy()
 		self.uffhtbx.inflate_ip(10,10)
 		self.invulntime = 0
@@ -397,6 +445,7 @@ class Player(pygame.sprite.Sprite):
 		self.movepos = [0,0]
 		self.invulntime = 0
 		self.lives = lives
+		self.charge = 2
 
 	def update(self):
 		self.movepos = [(self.state[0] * self.state[2]),(self.state[1] * self.state[2])]
@@ -404,7 +453,7 @@ class Player(pygame.sprite.Sprite):
 		if playrect.contains(newpos):
 			self.rect = newpos
 			self.uffhtbx = newpos.inflate(10,10)
-			self.imgpos = (self.rect.x - self.offset[0], self.rect.y - self.offset[1])
+			self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 			pygame.event.pump()
 		if not self.invulntime == 0:
 			self.invulntime -= 1
@@ -442,17 +491,23 @@ class Player(pygame.sprite.Sprite):
 	def shoot(self):
 		self.shootclock -= 1
 		if self.shootclock == 0:
-			friendlybullets.append(BulletFriendly((0,-6)))
 			friendlybullets.append(BulletFriendly((0.5,-6)))
 			friendlybullets.append(BulletFriendly((-0.5,-6)))
+			friendlybullets.append(BulletFriendly((0,-6)))
 			self.shootclock = 5
 			
-def createenemy(startposx,startposy,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health = 15,drop = 1,killpoint = 300):
+	def shootcharge(self):
+		if self.charge > 0:
+			if len(charges) == 0:
+				charges.append(Charge())
+				self.charge -= 1
+			
+def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1,delay = 0,health = 1,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
-	enemies.append(Enemy(startpos,pattern,bullettype,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
+	enemies.append(Enemy(startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
 	return
 
-def move(id,x,y,steps,mode):
+def move(id,x,y,steps,mode = 0):
 	xy = (x,y)
 	for e in enemies:
 		if e.id == id:
@@ -465,21 +520,22 @@ def delete(id):
 			e.delete()
 	return
 
-def switchshot(id,pattern,bullettype = 1,special = 0,special2 = 0):
+def switchshot(id,pattern,bullettype = 1,instances = 1,interval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1):
 	for e in enemies:
 		if e.id == id:
 			e.pattern = pattern
-			e.bullettype = bullettype
-			e.shootclock = 0
-			if pattern == 4:
-				e.angleclockint = float(special2)
-				e.patterninstances = special
-			elif pattern == 5:
-				e.patterninstances = special
-				
-def trackplayer(enemy,player,speed):
+			if pattern != 0:
+				e.bullettype = bullettype
+				e.patterninstances = instances
+				e.angleinterval = float(interval)
+				e.patternrotation = rotation
+				e.patternspeed = patternspeed
+				e.bulletspeed = float(bulletspeed) / bulletspeedfrac
+				e.shootclock = 0
+			
+def trackplayer(enemy,player,speed,offset = 0.0):
 	distance = complex(float((enemy.rect.centerx - player.rect.x)),float((enemy.rect.centery - player.rect.y)))
-	b_phase = phase(distance)
+	b_phase = phase(distance) + (offset/180*pi)
 	bulletdirection = rect(-speed,b_phase)
 	return bulletdirection.real, bulletdirection.imag
 	
@@ -512,3 +568,4 @@ particles = list()
 htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
+charges = list()

@@ -1,0 +1,33 @@
+enemy: [x | y | patron | tipo de bala | instancias | angulo de separacion | rotacion del patron | frecuencia del patron | velocidad de balas (numerador) | velocidad de balas (denominador) | delay | vida {15} | drop {1} | puntos {300}]
+switch: [id | patron | tipo de bala {1} | instancias {1} | angulo {0} | rotacion {0} | frecuencia {10} | velocidad de balas (numerador) {3} | velocidad de balas (denominador) {1}]
+	-instancias: decide cuantas instancias del patron en simultaneo
+	-angulo de separacion: decide cuanta separacion (en grados) tienen las balas
+	-rotacion: rota al patron x grados
+
+Patrones:
+	-1: Una sola bala (con mas instancias saca mas balas en angulo)
+	-2: Dos balas (con mas instancias saca mas balas en angulo)
+	-3: Bala apuntada al jugador (con mas instancias saca mas balas en angulo)
+	-3: 2 Balas apuntadas al jugador en angulo(con mas instancias saca mas balas en angulo)
+	-5: Lanza balas siguiendo un espiral
+	-6: Lanza balas con dirección aleatoria y la velocidad se multiplica aleatoriamente entre 0,5 y 2
+
+Balas:
+	-1: Bala normal(?)
+	-2: Bala grande
+	-3: Coso de los sims
+	-4: Bala normal pero con reskin
+	-5: Bala pequeña
+
+Drops:
+	-1: Punto
+	-2: Poder
+	-3: Carga
+	-4: Extension
+
+Los valores en {llaves} son los valores por defecto
+
+Recomendado formatear instrucciones enemy asi (con tab):
+	
+	50 enemy 130 -30	3 3 1 9 0 15 4 1 40	30 2 500
+		Coords	Variables de patron	Stats

@@ -108,8 +108,7 @@ def mandatodoalcarajo():
 		items[i].delete()
 	for i in reversed(xrange(len(friendlybullets))):
 		friendlybullets[i].delete()
-	for i in charges:
-		i.delete()
+	player.chargeobj.active = False
 	clases.currentenemyid = 0
 	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
 
@@ -254,6 +253,11 @@ def level(lives, screen, screentoscale):
 		#========= Actualizacion: =========
 		
 		player.update()
+		if debugmode:
+			for i in htbxlist:
+				debughtbxmarker = pygame.Surface((i.width,i.height))
+				debughtbxmarker.fill((255,255,255))
+				screentoscale.blit(debughtbxmarker,i)
 		for i in enemies:
 			i.update()
 			screentoscale.blit(i.image, i.imgpos)
@@ -266,9 +270,9 @@ def level(lives, screen, screentoscale):
 		for i in friendlybullets:
 			i.update()
 			screentoscale.blit(i.image, i.rect)
-		for i in charges:
-			i.update()
-			screentoscale.blit(i.chargemask,(60,10))
+		if player.chargeobj.active:
+			player.chargeobj.update()
+			screentoscale.blit(player.chargeobj.chargemask,(60,10))
 		for i in bullets:
 			i.update()
 			if player.invulntime == 0:
@@ -304,15 +308,15 @@ def level(lives, screen, screentoscale):
 			mandatodoalcarajo()
 			return gameoveroption
 			
-		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
+		pygame.transform.scale(screentoscale, screen.get_size(), screen)
 		
 		if player.invulntime == 0:
 			if player.rect.collidelist(htbxlist) != -1:
 				player.hit()
 		else:
 			if player.invulntime > 90:
-				for i in bullets:
-					i.delete()
+				for i in reversed(xrange(len(bullets))):
+					bullets[i].delete()
 			if player.invulntime % 5 == 0:
 				if player.invulntime % 10 == 0:
 					player.image = pygame.Surface((0,0))
@@ -321,7 +325,7 @@ def level(lives, screen, screentoscale):
 					if player.debuginvincible:
 						player.invulntime = 15
 		
-		pygame.display.flip()
+		pygame.display.update()
 		framecount += 1
 
 def scorescreen(screen, screentoscale):

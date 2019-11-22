@@ -7,6 +7,7 @@ pygame.mixer.init(frequency=44100,buffer=1024)
 pygame.init()
 
 currentenemyid = 0
+seed()
 
 class Particle(pygame.sprite.Sprite):
 	def __init__(self,startpos):
@@ -312,8 +313,7 @@ class Bullet(pygame.sprite.Sprite):
 			self.delete()
 		
 	def delete(self):
-		if self.rect in htbxlist:
-			htbxlist.remove(self.rect)
+		htbxlist.remove(self.rect)
 		bullets.remove(self)
 		del self
 		
@@ -385,28 +385,33 @@ class Charge(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.chargemask = pygame.Surface((340,340),SRCALPHA,32)
 		self.chargemask.convert_alpha()
-		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
-		self.duration = 10
-		self.locate()
+		self.active = False
 		
 	def locate(self):
+		self.active = True
+		self.duration = 15
+		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
 		if len(enemies) != 0:
 			for h in enemyhtbxlist:
-				self.thunderpoints.append((h.centerx-60,h.centery-10))
-			pygame.draw.lines(self.chargemask,(255,255,0),False,self.thunderpoints,4)
+				if playrect.colliderect(h):
+					self.thunderpoints.append((h.centerx-60,h.centery-10))
+			funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafuncionperopython3si(self.thunderpoints)
+			pygame.draw.lines(self.chargemask,(255,255,150),False,self.thunderpoints,6)
 			for e in reversed(xrange(len(enemies))):
-				enemies[e].die()
-				player.score += 100
+				if playrect.colliderect(enemies[e].rect):
+					enemies[e].die()
+					player.score += 100
 			
 	def update(self):
 		pygame.event.pump()
 		self.duration -= 1
+		if self.duration == 6:
+			self.chargemask.fill((0,0,50,0),None,BLEND_RGBA_ADD)
+			self.chargemask.fill((0,0,0,150),None,BLEND_RGBA_SUB)
 		if self.duration == 0:
-			self.delete()
+			self.active = False
+			self.chargemask.fill((0,0,0,0))
 	
-	def delete(self):
-		charges.remove(self)
-		
 class Player(pygame.sprite.Sprite):
 	
 	def __init__(self):
@@ -418,13 +423,6 @@ class Player(pygame.sprite.Sprite):
 		self.imgpos = (self.rect.centerx - self.imagecenter[0], self.rect.centery - self.imagecenter[1])
 		self.uffhtbx = self.rect.copy()
 		self.uffhtbx.inflate_ip(10,10)
-		self.invulntime = 0
-		self.lives = 1
-		self.power = 0
-		self.charge = 2
-		self.score = 0
-		self.shootclock = 5
-		self.debuginvincible = False
 		self.init()
 		
 	def init(self,lives = 1):
@@ -444,8 +442,13 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
+		self.power = 0
+		self.score = 0
+		self.shootclock = 5
+		self.debuginvincible = False
 		self.lives = lives
 		self.charge = 2
+		self.chargeobj = Charge()
 
 	def update(self):
 		self.movepos = [(self.state[0] * self.state[2]),(self.state[1] * self.state[2])]
@@ -463,6 +466,7 @@ class Player(pygame.sprite.Sprite):
 			self.rect.y = 300
 			self.invulntime = 150
 			self.lives -= 1
+			self.charge = 2
 			
 	def moveup(self):
 		if self.state[1] == 1:
@@ -498,10 +502,10 @@ class Player(pygame.sprite.Sprite):
 			
 	def shootcharge(self):
 		if self.charge > 0:
-			if len(charges) == 0:
-				charges.append(Charge())
+			if not self.chargeobj.active:
+				self.chargeobj.locate()
 				self.charge -= 1
-			
+				
 def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1,delay = 0,health = 1,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
 	enemies.append(Enemy(startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
@@ -547,12 +551,16 @@ def dirtoangle(dirx,diry):
 	if dirx == 0: return 90
 	bulletangle = -atan2(diry,dirx) / pi * 180
 	return bulletangle
-	
+
+def funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafuncionperopython3si(list,offset = 0):
+	for i in range(offset,len(list)):
+		j = randrange(offset,i+1)
+		list[i], list[j] = list[j], list[i]
+
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
 screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
-player = Player()
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
@@ -563,9 +571,10 @@ font_bold.set_bold(True)
 bullets = list()
 enemies = list()
 enemyhtbxlist = list()
+bullethtbxlist = list()
 items = list()
 particles = list()
 htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
-charges = list()
+player = Player()

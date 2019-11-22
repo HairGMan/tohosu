@@ -69,6 +69,7 @@ class Item(pygame.sprite.Sprite):
 			self.rect.y = startpos[1]
 			self.movepos = (0,2)
 			self.vectpos = [self.rect.x,self.rect.y]
+			self.autocollected = False
 		
 	def collect(self):
 		player.score += self.score
@@ -77,6 +78,8 @@ class Item(pygame.sprite.Sprite):
 		return
 		
 	def update(self):
+		if self.autocollected == True:
+			 self.movepos = trackplayer(self,player,4)
 		self.vectpos[0] += self.movepos[0]
 		self.vectpos[1] += self.movepos[1]
 		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
@@ -108,6 +111,11 @@ class ItemPoint(Item):
 		self.score = 100
 		self.dropstring = str(self.score*10)
 		Item.__init__(self,startpos)
+		
+	def update(self):
+		self.score = 25000 * 10 / self.rect.y
+		self.dropstring = str(self.score*10)
+		Item.update(self)
 		
 class ItemCharge(Item):
 	def __init__(self,startpos):
@@ -443,7 +451,7 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
-		self.power = 60
+		self.power = 64
 		self.score = 0
 		self.shootclock = 5
 		self.debuginvincible = False
@@ -461,6 +469,8 @@ class Player(pygame.sprite.Sprite):
 			pygame.event.pump()
 		if not self.invulntime == 0:
 			self.invulntime -= 1
+		if (self.power == 64) & (self.rect.centery < 50):
+			self.autocollect()
 			
 	def hit(self):
 			self.rect.x = 230
@@ -468,6 +478,7 @@ class Player(pygame.sprite.Sprite):
 			self.invulntime = 150
 			self.lives -= 1
 			self.charge = 2
+			self.power = 0
 			
 	def moveup(self):
 		if self.state[1] == 1:
@@ -506,6 +517,10 @@ class Player(pygame.sprite.Sprite):
 			if not self.chargeobj.active:
 				self.chargeobj.locate()
 				self.charge -= 1
+				
+	def autocollect(self):
+		for i in items:
+			i.autocollected = True
 				
 def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1,delay = 0,health = 1,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)

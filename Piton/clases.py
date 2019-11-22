@@ -400,10 +400,12 @@ class Charge(pygame.sprite.Sprite):
 		self.active = True
 		self.duration = 15
 		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
+		self.rects = [player.rect.inflate(60,60)]
 		if len(enemies) != 0:
 			for h in enemyhtbxlist:
 				if playrect.colliderect(h):
 					self.thunderpoints.append((h.centerx-60,h.centery-10))
+					self.rects.append((h.inflate(30,30)))
 			funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafuncionperopython3si(self.thunderpoints)
 			pygame.draw.lines(self.chargemask,(255,255,150),False,self.thunderpoints,6)
 			for e in reversed(xrange(len(enemies))):
@@ -413,6 +415,9 @@ class Charge(pygame.sprite.Sprite):
 			
 	def update(self):
 		pygame.event.pump()
+		for b in bullets:
+			if not b.rect.collidelist(self.rects) == -1:
+				b.delete()
 		self.duration -= 1
 		if self.duration == 6:
 			self.chargemask.fill((0,0,50,0),None,BLEND_RGBA_ADD)

@@ -156,17 +156,25 @@ def level(lives, screen, screentoscale):
 	gui = pygame.image.load("sprites/gui_place_nochoto_tr.png").convert_alpha()
 	lifesprite = pygame.image.load("sprites/place_life_red2_tr.png").convert_alpha()
 	chargesprite = pygame.image.load("sprites/place_life_orange2_tr.png").convert_alpha()
-	scoretext = font.render("Puntaje", True, (255,255,255))
-	recordtext = font.render(u"Récord", True, (255,255,255))
-	recordamount = font.render(str(record).zfill(11) + "0", True, (255,255,255))
+	scoretext = font.render("Puntaje", False, (255,255,255))
+	recordtext = font.render(u"Récord", False, (255,255,255))
+	recordamount = font.render(str(record).zfill(11) + "0", False, (255,255,255))
+	powermeter = pygame.Surface((128,20))
+	powermeter.fill((255,255,255))
+	powermeter.set_alpha(150)
+	powersprite = pygame.image.load("sprites/item_p_red_tr.png").convert_alpha()
 	player.init(lives)
 	while 1:
 		clock.tick_busy_loop(60)
-		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", True, (255,255,255))
-		bulletcountdisp = font.render("Balas:" + str(len(bullets)+len(friendlybullets)), True, (255,255,255))
-		enemycountdisp = font.render("Enemigos:" + str(len(enemies)), True, (255,255,255))
-		uffmeter = font.render("Uff: " + str(uff), True, (255,255,255))
-		scoremeter = font.render(str(player.score).zfill(11) + "0", True, (255,255,255))
+		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", False, (255,255,255))
+		bulletcountdisp = font.render("Balas:" + str(len(bullets)+len(friendlybullets)), False, (255,255,255))
+		enemycountdisp = font.render("Enemigos:" + str(len(enemies)), False, (255,255,255))
+		uffmeter = font.render("Uff: " + str(uff), False, (255,255,255))
+		scoremeter = font.render(str(player.score).zfill(11) + "0", False, (255,255,255))
+		if player.power == 64:
+			powermetertext = font_meter.render(str(player.power), False, (255,0,255))
+		else:
+			powermetertext = font_meter.render(str(player.power), False, (255,255,255))
 		backgroundoffset += 0.1
 		
 		#========= Eventos de teclado: =========
@@ -294,8 +302,10 @@ def level(lives, screen, screentoscale):
 		screentoscale.blit(scoremeter,(480,60))
 		screentoscale.blit(recordtext,(450,90))
 		screentoscale.blit(recordamount,(480,115))
-		screentoscale.blit(uffmeter,(450,210))
-		
+		screentoscale.blit(powermeter,(470,210),(0,0,player.power*2,18))
+		screentoscale.blit(powermetertext,(475,210))
+		screentoscale.blit(powersprite,(450,211))
+		screentoscale.blit(uffmeter,(450,240))
 		#========= Manejo de vidas: =========
 		
 		for i in range(player.lives - 1):

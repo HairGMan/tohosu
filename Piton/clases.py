@@ -98,7 +98,8 @@ class ItemPower(Item):
 		Item.__init__(self,startpos)
 		
 	def collect(self):
-		player.power += 1
+		if player.power < 64:
+			player.power += 1
 		Item.collect(self)
 
 class ItemPoint(Item):
@@ -442,7 +443,7 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
-		self.power = 0
+		self.power = 60
 		self.score = 0
 		self.shootclock = 5
 		self.debuginvincible = False
@@ -568,6 +569,7 @@ font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
 font_small = pygame.font.Font("sprites/MSGOTHIC.TTC", 10)
 font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
 font_bold.set_bold(True)
+font_meter = pygame.font.Font("sprites/MSGOTHIC.TTC", 18)
 bullets = list()
 enemies = list()
 enemyhtbxlist = list()

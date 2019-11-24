@@ -30,4 +30,6 @@ Los valores en {llaves} son los valores por defecto
 Recomendado formatear instrucciones enemy asi (con tab):
 	
 	50 enemy 130 -30	3 3 1 9 0 15 4 1 40	30 2 500
-		Coords	Variables de patron	Stats
+		Coords		Variables de patron	Stats
+
+move: 

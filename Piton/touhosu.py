@@ -99,15 +99,17 @@ def haltandcatchfire():
 #        pygame.mixer.music.unload()
         #aca iria alguna manera de llamar al proximo nivel
 		
+#========= Funcion que manda todo al carajo: =========
+		
 def mandatodoalcarajo():
-	for i in reversed(xrange(len(enemies))):
-		enemies[i].delete()
-	for i in reversed(xrange(len(bullets))):
-		bullets[i].delete()
-	for i in reversed(xrange(len(items))):
-		items[i].delete()
-	for i in reversed(xrange(len(friendlybullets))):
-		friendlybullets[i].delete()
+	for i in reversed(enemies):
+		i.delete()
+	for i in reversed(bullets):
+		i.delete()
+	for i in reversed(items):
+		i.delete()
+	for i in reversed(friendlybullets):
+		i.delete()
 	player.chargeobj.active = False
 	clases.currentenemyid = 0
 	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
@@ -137,13 +139,14 @@ eventnum = len(eventlist)
 clock = pygame.time.Clock()
 clock
 debugmode = False
+debugenemycount = 0
+debugshowhitboxes = False
 
 #========= Runtime: =========
-debugenemycount = 0
 
 def level(lives, screen, screentoscale):
 	pygame.mouse.set_visible(False)
-	global debugmode
+	global debugmode, debugenemycount, debugshowhitboxes
 	framecount = 0
 	ev = 0
 	eventend = False
@@ -227,6 +230,12 @@ def level(lives, screen, screentoscale):
 					if debugmode:
 						player.debuginvincible = not player.debuginvincible
 						player.invulntime = 15
+				elif event.key == pygame.K_f:
+					if debugmode:
+						backgroundoffset = -400
+				elif event.key == pygame.K_h:
+					if debugmode:
+						debugshowhitboxes = not debugshowhitboxes
 				
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LSHIFT:
@@ -261,7 +270,7 @@ def level(lives, screen, screentoscale):
 		#========= Actualizacion: =========
 		
 		player.update()
-		if debugmode:
+		if debugshowhitboxes:
 			for i in htbxlist:
 				debughtbxmarker = pygame.Surface((i.width,i.height))
 				debughtbxmarker.fill((255,255,255))
@@ -325,8 +334,8 @@ def level(lives, screen, screentoscale):
 				player.hit()
 		else:
 			if player.invulntime > 90:
-				for i in reversed(xrange(len(bullets))):
-					bullets[i].delete()
+				for i in reversed(bullets):
+					i.delete()
 			if player.invulntime % 5 == 0:
 				if player.invulntime % 10 == 0:
 					player.image = pygame.Surface((0,0))

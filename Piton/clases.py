@@ -103,6 +103,8 @@ class ItemPower(Item):
 	def collect(self):
 		if player.power < 64:
 			player.power += 1
+		if player.power >= 20:
+			player.pattern = player.lvl2Pattern
 		Item.collect(self)
 
 class ItemPoint(Item):
@@ -113,7 +115,10 @@ class ItemPoint(Item):
 		Item.__init__(self,startpos)
 		
 	def update(self):
-		self.score = 25000 * 10 / self.rect.y
+		if self.rect.y < 30:
+			self.score = 30000
+		else:
+			self.score = 25000 * 10 / self.rect.y
 		self.dropstring = str(self.score*10)
 		Item.update(self)
 		
@@ -362,9 +367,8 @@ class BulletE(Bullet):
 		Bullet.__init__(self,speed,startpos)
 		
 class BulletFriendly(Bullet):
-	def __init__(self,speed):
+	def __init__(self,speed,player):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
 		self.rect = self.image.get_rect()
 		friendlyhtbxlist.append(self.rect)
 		self.init(speed,(player.rect.centerx-self.rect.centerx,player.rect.top))
@@ -389,6 +393,16 @@ class BulletFriendly(Bullet):
 		friendlybullets.remove(self)
 		del self
 		
+class BulletFriendlyA(BulletFriendly):
+	def __init__(self,speed,player):
+		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
+		BulletFriendly.__init__(self,speed,player)
+		
+class BulletFriendlyB(BulletFriendly):
+	def __init__(self,speed,player):
+		self.image = pygame.image.load("sprites/bulletfriendlyb_tr.png").convert_alpha()
+		BulletFriendly.__init__(self,speed,player)
+		
 class Charge(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -400,22 +414,22 @@ class Charge(pygame.sprite.Sprite):
 		self.active = True
 		self.duration = 15
 		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
-		self.rects = [player.rect.inflate(60,60)]
+		self.rects = [player.rect.inflate(120,120)]
 		if len(enemies) != 0:
 			for h in enemyhtbxlist:
 				if playrect.colliderect(h):
 					self.thunderpoints.append((h.centerx-60,h.centery-10))
-					self.rects.append((h.inflate(30,30)))
+					self.rects.append((h.inflate(60,60)))
 			funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafuncionperopython3si(self.thunderpoints)
 			pygame.draw.lines(self.chargemask,(255,255,150),False,self.thunderpoints,6)
-			for e in reversed(xrange(len(enemies))):
-				if playrect.colliderect(enemies[e].rect):
-					enemies[e].die()
+			for e in reversed(enemies):
+				if playrect.colliderect(e.rect):
+					e.die()
 					player.score += 100
 			
 	def update(self):
 		pygame.event.pump()
-		for b in bullets:
+		for b in reversed(bullets):
 			if not b.rect.collidelist(self.rects) == -1:
 				b.delete()
 		self.duration -= 1
@@ -456,7 +470,8 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
-		self.power = 64
+		self.power = 18
+		self.pattern = self.lvl1Pattern
 		self.score = 0
 		self.shootclock = 5
 		self.debuginvincible = False
@@ -512,10 +527,16 @@ class Player(pygame.sprite.Sprite):
 	def shoot(self):
 		self.shootclock -= 1
 		if self.shootclock == 0:
-			friendlybullets.append(BulletFriendly((0.5,-6)))
-			friendlybullets.append(BulletFriendly((-0.5,-6)))
-			friendlybullets.append(BulletFriendly((0,-6)))
+			self.pattern()
 			self.shootclock = 5
+			
+	def lvl1Pattern(self):
+		friendlybullets.append(BulletFriendlyB((0,-6),self))
+			
+	def lvl2Pattern(self):
+		friendlybullets.append(BulletFriendlyA((0.5,-6),self))
+		friendlybullets.append(BulletFriendlyA((-0.5,-6),self))
+		friendlybullets.append(BulletFriendlyA((0,-6),self))
 			
 	def shootcharge(self):
 		if self.charge > 0:
@@ -532,7 +553,7 @@ def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterv
 	enemies.append(Enemy(startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
 	return
 
-def move(id,x,y,steps,mode = 0):
+def move(id,x,y,steps):
 	xy = (x,y)
 	for e in enemies:
 		if e.id == id:
@@ -581,7 +602,7 @@ def funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafunc
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
-screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
+#screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)

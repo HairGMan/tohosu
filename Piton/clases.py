@@ -14,7 +14,10 @@ class Highscore():
 		self.score = score
 		self.name = name
 		self.scoretext = font_bold.render(str(score),False,(255,255,100))
-		self.nametext = font.render(name,False,(255,255,100))
+		self.nametext = font.render(self.name,False,(255,255,100))
+		
+	def updatename(self):
+		self.nametext = font.render(self.name,False,(255,255,100))
 
 class Particle(pygame.sprite.Sprite):
 	def __init__(self,startpos):
@@ -110,8 +113,7 @@ class ItemPower(Item):
 	def collect(self):
 		if player.power < 64:
 			player.power += 1
-		if player.power >= 20:
-			player.pattern = player.lvl2Pattern
+			player.changepattern()
 		Item.collect(self)
 
 class ItemPoint(Item):
@@ -374,11 +376,11 @@ class BulletE(Bullet):
 		Bullet.__init__(self,speed,startpos)
 		
 class BulletFriendly(Bullet):
-	def __init__(self,speed,player):
+	def __init__(self,speed,playerrect,offset):
 		pygame.sprite.Sprite.__init__(self)
 		self.rect = self.image.get_rect()
 		friendlyhtbxlist.append(self.rect)
-		self.init(speed,(player.rect.centerx-self.rect.centerx,player.rect.top))
+		self.init(speed,(playerrect.centerx-self.rect.centerx+offset,playerrect.top))
 		self.imgpos = self.rect
 		
 	def update(self):
@@ -401,14 +403,14 @@ class BulletFriendly(Bullet):
 		del self
 		
 class BulletFriendlyA(BulletFriendly):
-	def __init__(self,speed,player):
+	def __init__(self,speed,playerrect,offset):
 		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
-		BulletFriendly.__init__(self,speed,player)
+		BulletFriendly.__init__(self,speed,playerrect,offset)
 		
 class BulletFriendlyB(BulletFriendly):
-	def __init__(self,speed,player):
+	def __init__(self,speed,playerrect,offset):
 		self.image = pygame.image.load("sprites/bulletfriendlyb_tr.png").convert_alpha()
-		BulletFriendly.__init__(self,speed,player)
+		BulletFriendly.__init__(self,speed,playerrect,offset)
 		
 class Charge(pygame.sprite.Sprite):
 	def __init__(self):
@@ -477,7 +479,7 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
-		self.power = 18
+		self.power = 0
 		self.pattern = self.lvl1Pattern
 		self.score = 0
 		self.shootclock = 5
@@ -500,12 +502,17 @@ class Player(pygame.sprite.Sprite):
 			self.autocollect()
 			
 	def hit(self):
+			for i in range(8):
+				items.append(ItemPower((self.rect.x+randrange(-50,50),self.rect.y+randrange(-50,50))))
 			self.rect.x = 230
 			self.rect.y = 300
 			self.invulntime = 150
 			self.lives -= 1
 			self.charge = 2
-			self.power = 0
+			self.power -= 16
+			if self.power < 0:
+				self.power = 0
+			self.changepattern()
 			
 	def moveup(self):
 		if self.state[1] == 1:
@@ -538,13 +545,48 @@ class Player(pygame.sprite.Sprite):
 			self.shootclock = 5
 			
 	def lvl1Pattern(self):
-		friendlybullets.append(BulletFriendlyB((0,-6),self))
-			
+		friendlybullets.append(BulletFriendlyB((0,-6),self.rect,0))
+		
 	def lvl2Pattern(self):
-		friendlybullets.append(BulletFriendlyA((0.5,-6),self))
-		friendlybullets.append(BulletFriendlyA((-0.5,-6),self))
-		friendlybullets.append(BulletFriendlyA((0,-6),self))
+		friendlybullets.append(BulletFriendlyA((0.3,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyA((-0.3,-6),self.rect,0))
 			
+	def lvl3Pattern(self):
+		friendlybullets.append(BulletFriendlyA((0.5,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyA((-0.5,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyA((0,-6),self.rect,0))
+		
+	def lvl4Pattern(self):
+		friendlybullets.append(BulletFriendlyA((0.7,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyA((-0.7,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyB((0.0,-6),self.rect,5.0))
+		friendlybullets.append(BulletFriendlyB((-0.0,-6),self.rect,-5.0))
+		
+	def lvl5Pattern(self):
+		friendlybullets.append(BulletFriendlyA((0.8,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyA((-0.8,-6),self.rect,0))
+		friendlybullets.append(BulletFriendlyB((0.0,-6),self.rect,10.0))
+		friendlybullets.append(BulletFriendlyB((-0.0,-6),self.rect,-10.0))
+		friendlybullets.append(BulletFriendlyA((0.0,-6),self.rect,0))			
+		
+	def changepattern(self):
+		if self.power < 16:
+			self.pattern = self.lvl1Pattern
+		elif self.power < 32:
+			self.pattern = self.lvl2Pattern
+		elif self.power < 48:
+			self.pattern = self.lvl3Pattern
+		elif self.power < 64:
+			self.pattern = self.lvl4Pattern
+		elif self.power == 64:
+			self.pattern = self.lvl5Pattern
+			self.fullpower()
+
+	def fullpower(self):
+		for b in reversed(bullets):
+			b.delete()
+		return
+	
 	def shootcharge(self):
 		if self.charge > 0:
 			if not self.chargeobj.active:

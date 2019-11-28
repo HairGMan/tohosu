@@ -34,7 +34,7 @@ def pause():
 						cursorpos[1] += 30
 				elif event.key == pygame.K_ESCAPE:
 						return 0
-				elif event.key == pygame.K_z:
+				elif event.key == pygame.K_z or event.key == pygame.K_RETURN:
 						return selct_option
 		for i in options:
 			i.deselect()
@@ -50,8 +50,10 @@ def highscorescreen():
 	global screen
 	background = pygame.image.load("sprites/highscores_1_2.png").convert_alpha() 
 	title = font_bold.render(u"Puntajes más altos",False,(255,255,100))
+	currenthighscore = -1
 	for s in highscores:
 		if player.score*10 > s.score:
+			currenthighscore = highscores.index(s)
 			highscores.insert(highscores.index(s),Highscore(player.score*10,""))
 			highscores.pop()
 			break
@@ -61,8 +63,17 @@ def highscorescreen():
 			if event.type == pygame.QUIT: 
 				sys.exit()
 			elif event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_ESCAPE:
+				if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
 					return
+				else:
+					if not currenthighscore == -1:
+						if event.key == pygame.K_BACKSPACE:
+							if len(highscores[currenthighscore].name) > 0:
+								highscores[currenthighscore].name = highscores[currenthighscore].name[:-1]
+						else:
+							highscores[currenthighscore].name += event.unicode
+						highscores[currenthighscore].updatename()
+						
 		screentoscale.blit(background,area)
 		screentoscale.blit(title,(320-title.get_width()/2,20))
 		for s in highscores:
@@ -102,7 +113,7 @@ def gameover():
 					options[1].select()
 					options[0].deselect()
 					cursorpos = (120,250)
-				if event.key == pygame.K_z:
+				if event.key == pygame.K_z or event.key == pygame.K_RETURN:
 					for i in options:
 						if i.selected:
 							selct_option = i.id
@@ -260,7 +271,21 @@ def level(lives, screen, screentoscale):
 				elif event.key == pygame.K_h:
 					if debugmode:
 						debugshowhitboxes = not debugshowhitboxes
-				
+				elif event.key == pygame.K_v:
+					if debugmode:
+						player.lives = 7
+				elif event.key == pygame.K_c:
+					if debugmode:
+						player.charge = 7
+				elif event.key == pygame.K_p:
+					if debugmode:
+						if event.mod == pygame.KMOD_LSHIFT:
+							if player.power < 64:
+								player.power += 1
+						else:
+							player.power = 64
+						player.changepattern()
+						
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LSHIFT:
 					player.state[2] = 3

@@ -9,6 +9,13 @@ pygame.init()
 currentenemyid = 0
 seed()
 
+class Highscore():
+	def __init__(self,score,name):
+		self.score = score
+		self.name = name
+		self.scoretext = font_bold.render(str(score),False,(255,255,100))
+		self.nametext = font.render(name,False,(255,255,100))
+
 class Particle(pygame.sprite.Sprite):
 	def __init__(self,startpos):
 		pygame.sprite.Sprite.__init__(self)
@@ -86,7 +93,7 @@ class Item(pygame.sprite.Sprite):
 		pygame.event.pump()
 		if not bulletliferect.contains(self.rect):
 			self.delete()
-		if self.rect.colliderect(player.uffhtbx):
+		elif self.rect.colliderect(player.uffhtbx):
 			self.collect()
 			
 	def delete(self):
@@ -602,7 +609,7 @@ def funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafunc
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
-#screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
+screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
@@ -621,3 +628,15 @@ htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
 player = Player()
+highscores = [
+	Highscore(400000,"Maldonado"),
+	Highscore(300000,"Mariano"),
+	Highscore(250000,"Ponisio"),
+	Highscore(200000,"Norberto"),
+	Highscore(150000,"Juan"),
+	Highscore(100000,"Lorenzo"),
+	Highscore(80000,"Giachello"),
+	Highscore(60000,"Corcho"),
+	Highscore(40000,"Diana"),
+	Highscore(20000,"Doyel")
+]

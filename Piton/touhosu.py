@@ -46,6 +46,30 @@ def pause():
 		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 		pygame.display.flip()
 
+def highscorescreen():
+	global screen
+	background = pygame.image.load("sprites/highscores_1_2.png").convert_alpha() 
+	title = font_bold.render(u"Puntajes más altos",False,(255,255,100))
+	for s in highscores:
+		if player.score*10 > s.score:
+			highscores.insert(highscores.index(s),Highscore(player.score*10,""))
+			highscores.pop()
+			break
+	while 1:
+		clock.tick_busy_loop(60)
+		for event in pygame.event.get():		
+			if event.type == pygame.QUIT: 
+				sys.exit()
+			elif event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE:
+					return
+		screentoscale.blit(background,area)
+		screentoscale.blit(title,(320-title.get_width()/2,20))
+		for s in highscores:
+			screentoscale.blit(s.scoretext,(430,30+30*(1+highscores.index(s))))
+			screentoscale.blit(s.nametext,(140,30+30*(1+highscores.index(s))))
+		pygame.transform.scale(screentoscale, screen.get_size(), screen)
+		pygame.display.update()
 
 def gameover():
 	global screen
@@ -152,7 +176,7 @@ def level(lives, screen, screentoscale):
 	eventend = False
 	pygame.mixer.music.load(nombreNivel + "/nice_lvl_3.wav")
 	pygame.mixer.music.play(-1)
-	background = pygame.image.load(nombreNivel + "/fondo.jpg").convert()
+	background = pygame.image.load(nombreNivel + "/fondo.png").convert()
 	backgroundoffset = 350.0
 	record = 999999999
 	uff = 0
@@ -253,7 +277,7 @@ def level(lives, screen, screentoscale):
 		if pygame.key.get_pressed()[pygame.K_z]:
 			player.shoot()
 				
-		screentoscale.blit(background, (0, - background.get_height() + backgroundoffset))
+		screentoscale.blit(background, (60, - background.get_height() + backgroundoffset))
 		
 		#========= Manejo de eventos: =========
 	
@@ -325,6 +349,8 @@ def level(lives, screen, screentoscale):
 		if player.lives == 0:
 			gameoveroption = gameover()
 			mandatodoalcarajo()
+			if gameoveroption == 1:
+				highscorescreen()
 			return gameoveroption
 			
 		pygame.transform.scale(screentoscale, screen.get_size(), screen)

@@ -137,3 +137,13 @@ Elijan cualquier cosa de esto o sino hagan lo que se les cante el ojete
 		-Si se bancan 1 variable mas les queria hacer colores a las balas
 	-Creada documentacion para el formato de eventos
 	-Alguna otra boludez mas habre hecho
+
+18/11 - 27/11:
+	-Ya lo documentare
+
+28/11 - 1:
+	-Agregados laseres
+		-No tienen animacion porque es una paja
+		-son 4 sus variables: [id enemigo, angulo, ancho, duracion]
+		-En el thi se crean con la instruccion laser
+			-y las variables en ese orden no me rompan las b o l a s con documentarlo

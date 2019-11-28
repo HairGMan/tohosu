@@ -142,6 +142,8 @@ def mandatodoalcarajo():
 		i.delete()
 	for i in reversed(friendlybullets):
 		i.delete()
+	for i in reversed(lasers):
+		i.delete()
 	player.chargeobj.active = False
 	clases.currentenemyid = 0
 	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
@@ -349,7 +351,8 @@ def level(level, lives, screen, screentoscale):
 			screentoscale.blit(player.chargeobj.chargemask,(60,10))
 		for i in lasers:
 			i.update()
-			screentoscale.blit(i.image, i.rect)
+			if i.active:
+				screentoscale.blit(i.image, i.rect)
 		for i in friendlybullets:
 			i.update()
 			screentoscale.blit(i.image, i.rect)

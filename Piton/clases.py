@@ -10,7 +10,7 @@ currentenemyid = 0
 seed()
 
 class Laser(pygame.sprite.Sprite):
-	def __init__(self,origin,angle,width,duration):
+	def __init__(self,origin,angle,width,duration,chargephase,enemyid):
 		pygame.sprite.Sprite.__init__(self)
 		self.origin = origin
 		if angle == -1:
@@ -21,34 +21,61 @@ class Laser(pygame.sprite.Sprite):
 		else:
 			self.angle = angle
 		self.duration = duration
-		self.image = pygame.image.load("sprites/laser.png").convert_alpha()
-		self.actuallaserwidth = self.image.get_width()*width
-		self.image = pygame.transform.scale(self.image,(self.actuallaserwidth,self.image.get_height()))
+		self.enemyid = enemyid
+		self.chargephase = chargephase
+		self.durationcounter = 0
+		self.active = False
+		self.baseimage = pygame.image.load("sprites/laser.png").convert_alpha()
+		self.width = width
+		self.actuallaserwidth = self.baseimage.get_width()*width
+		self.image = pygame.transform.scale(self.baseimage,(self.actuallaserwidth,self.baseimage.get_height()))
 		self.image = pygame.transform.rotate(self.image,-self.angle)
 		self.rect = self.image.get_rect()
-		self.lasermask = pygame.mask.from_surface(self.image)
+		self.linemask = pygame.Surface((340,340),SRCALPHA)
+		self.lasermask = None
 		if self.angle <= 90:
-			self.rect.topright = self.origin
-			self.rect.right += self.actuallaserwidth/2
-			self.rect.top -= self.actuallaserwidth/2
+			self.phase = 270
 		elif self.angle <= 180:
-			self.rect.bottomright = self.origin
-			self.rect.right += self.actuallaserwidth/2
-			self.rect.bottom += self.actuallaserwidth/2
+			self.phase = 0
 		elif self.angle <= 270:
-			self.rect.bottomleft = self.origin
-			self.rect.left -= self.actuallaserwidth/2
-			self.rect.bottom += self.actuallaserwidth/2
+			self.phase = 90
 		elif self.angle <= 360:
-			self.rect.topleft = self.origin
-			self.rect.left -= self.actuallaserwidth/2
-			self.rect.top -= self.actuallaserwidth/2
+			self.phase = 180
+		
+	def repos(self,width): 
+		if self.angle <= 90:
+			self.rect.topright = [self.origin[0] + angletodir(self.actuallaserwidth-width/2,self.phase+90-self.angle%90)[0], self.origin[1] + angletodir(width/2,self.phase+90-self.angle%90)[1]]
+		elif self.angle <= 180:
+			self.rect.bottomright = [self.origin[0] + angletodir(self.actuallaserwidth-width/2,self.phase+90-self.angle%90)[0], self.origin[1] + angletodir(self.actuallaserwidth-width/2,self.phase+90-self.angle%90)[1]]
+		elif self.angle <= 270:
+			self.rect.bottomleft = [self.origin[0] + angletodir(width/2,self.phase+90-self.angle%90)[0], self.origin[1] + angletodir(self.actuallaserwidth-width/2,self.phase+90-self.angle%90)[1]]
+		elif self.angle <= 360:
+			self.rect.topleft = [self.origin[0] + angletodir(width/2,self.phase+90-self.angle%90)[0], self.origin[1] + angletodir(width/2,self.phase+90-self.angle%90)[1]]
+			
+	def drawthemlines(self):
+		endpoint = angletodir(600,self.angle+90)
+		pygame.draw.line(self.linemask,(255,255,255),(self.origin[0]-60,self.origin[1]-10),(self.origin[0]+endpoint[0]-60,self.origin[1]+endpoint[1]-10),self.width)
 			
 	def update(self):
-		self.duration -= 1
-		if self.duration == 0:
+		self.durationcounter += 1
+		if self.durationcounter == 1:
+			self.linemask.fill((0,0,0,0))
+			self.drawthemlines()
+		elif self.durationcounter < self.chargephase:
+			screentoscale.blit(self.linemask,(60,10))
+		elif self.durationcounter < (20 + self.chargephase) and self.durationcounter > self.chargephase:
+			self.active = True
+			self.image = pygame.transform.scale(self.baseimage,(self.actuallaserwidth*(self.durationcounter-self.chargephase)/20,self.baseimage.get_height()))
+			self.image = pygame.transform.rotate(self.image,-self.angle)
+			self.lasermask = pygame.mask.from_surface(self.image)
+			self.repos(self.actuallaserwidth*(self.durationcounter-self.chargephase)/20)
+		elif self.durationcounter > self.duration - 20 and self.durationcounter < self.duration:
+			self.image = pygame.transform.scale(self.baseimage,(self.actuallaserwidth*(self.duration-self.durationcounter)/20,self.baseimage.get_height()))
+			self.image = pygame.transform.rotate(self.image,-self.angle)
+			self.lasermask = pygame.mask.from_surface(self.image)
+			self.repos(self.actuallaserwidth*(self.duration-self.durationcounter)/20)
+		elif self.durationcounter == self.duration:
 			self.delete()
-			
 	def delete(self):
 		lasers.remove(self)
 
@@ -352,6 +379,9 @@ class Enemy(pygame.sprite.Sprite):
 		enemies.remove(self)
 		htbxlist.remove(self.rect)
 		enemyhtbxlist.remove(self.rect)
+		for l in lasers:
+			if l.enemyid == self.id:
+				l.delete()
 		del self
 		
 class Bullet(pygame.sprite.Sprite):
@@ -646,10 +676,14 @@ class Player(pygame.sprite.Sprite):
 			
 	def checklasercollision(self):
 		for l in lasers:
-			if l.rect.colliderect(self.rect):
-				if l.lasermask.get_at((self.rect.centerx-l.rect.left,self.rect.centery-l.rect.top)):
-					self.hit()
-				
+			if l.active:
+				if l.rect.colliderect(self.rect):
+					try:
+						if l.lasermask.get_at((self.rect.centerx-l.rect.left,self.rect.centery-l.rect.top)):
+							self.hit()
+					except IndexError:
+						pass
+						
 def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1,delay = 0,health = 1,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
 	enemies.append(Enemy(startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint))
@@ -687,10 +721,10 @@ def trackplayer(enemyrect,playerrect,speed,offset = 0.0):
 	bulletdirection = rect(-speed,b_phase)
 	return bulletdirection.real, bulletdirection.imag
 	
-def shootlaser(enemy,angle,width,duration):
+def shootlaser(enemy,angle,width,duration,chargephase):
 	for e in enemies:
 		if e.id == enemy:
-			lasers.append(Laser(e.rect.center,angle,width,duration))
+			lasers.append(Laser(e.rect.center,angle,width,duration,chargephase,e.id))
 	
 def angletodir(speed,angle):
 	bulletdirection = rect(speed,(angle/180*pi))

@@ -424,17 +424,21 @@ class Charge(pygame.sprite.Sprite):
 		self.duration = 15
 		self.thunderpoints = [(player.rect.centerx-60,player.rect.centery-10)]
 		self.rects = [player.rect.inflate(120,120)]
-		if len(enemies) != 0:
+		if not playrect.collidelist(enemyhtbxlist) == -1:
 			for h in enemyhtbxlist:
 				if playrect.colliderect(h):
 					self.thunderpoints.append((h.centerx-60,h.centery-10))
 					self.rects.append((h.inflate(60,60)))
 			funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafuncionperopython3si(self.thunderpoints)
-			pygame.draw.lines(self.chargemask,(255,255,150),False,self.thunderpoints,6)
 			for e in reversed(enemies):
 				if playrect.colliderect(e.rect):
 					e.die()
 					player.score += 100
+		else:
+			for t in range(4):
+				self.thunderpoints.append((randrange(0,340),randrange(0,340)))
+				self.rects.append(pygame.Rect(self.thunderpoints[t][0]-30,self.thunderpoints[t][1]-30,60,60))
+		pygame.draw.lines(self.chargemask,(255,255,150),False,self.thunderpoints,6)
 			
 	def update(self):
 		pygame.event.pump()

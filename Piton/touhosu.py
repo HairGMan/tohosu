@@ -125,9 +125,6 @@ def gameover():
 		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 		pygame.display.flip()
 
-#========= Que nivel?: ==============
-nombreNivel = "../NivelPrueba"
-
 #========= Funcion de salida:=========
 def haltandcatchfire():
         pygame.mixer.music.stop()
@@ -150,25 +147,30 @@ def mandatodoalcarajo():
 	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
 
 #========= Lector de eventos: ==========
+
 eventdict = {
 	"enemy" :	createenemy,
 	"move" :	move,
 	"delete":	delete,
-    "end":		haltandcatchfire,
-	"switch":	switchshot
+	"end":		haltandcatchfire,
+	"switch":	switchshot,
+	"laser":	shootlaser
 	}
-eventfile = open(nombreNivel + "/eventos.thi","r")
-eventlines = eventfile.readlines()
-eventfile.close()
-eventlist = list()
+	
+def eventread(nombreNivel):
+	eventfile = open("../" + nombreNivel + "/eventos.thi","r")
+	eventlines = eventfile.readlines()
+	eventfile.close()
+	eventlist = list()
 
-for i in range(len(eventlines)):
-	eventlist.append((eventlines[i].split()))
-	for d in range(len(eventlist[i])):
-		if d != 1:
-			eventlist[i][d] = int(eventlist[i][d])
+	for i in range(len(eventlines)):
+		eventlist.append((eventlines[i].split()))
+		for d in range(len(eventlist[i])):
+			if d != 1:
+				eventlist[i][d] = int(eventlist[i][d])
 
-eventnum = len(eventlist)
+	eventnum = len(eventlist)
+	return eventlist, eventnum
 
 #========= Frames, eventos: =========
 clock = pygame.time.Clock()
@@ -179,15 +181,23 @@ debugshowhitboxes = False
 
 #========= Runtime: =========
 
-def level(lives, screen, screentoscale):
+def level(level, lives, screen, screentoscale):
 	pygame.mouse.set_visible(False)
 	global debugmode, debugenemycount, debugshowhitboxes
+	levelfolderdict = {
+		0: 	"NivelPrueba",
+		1: 	"Nivel1",
+		2: 	"Nivel2",
+		3: 	"Nivel3"
+	}
+	levelevents = eventlist, eventnum = eventread(levelfolderdict[level])
 	framecount = 0
 	ev = 0
 	eventend = False
-	pygame.mixer.music.load(nombreNivel + "/nice_lvl_3.wav")
+	pygame.mixer.music.load("../" + levelfolderdict[level] + "/nice_lvl_3.wav")
 	pygame.mixer.music.play(-1)
-	background = pygame.image.load(nombreNivel + "/fondo.png").convert()
+	background = pygame.image.load("../" + levelfolderdict[level] + "/fondo.png").convert()
+	backgroundheight = background.get_height() + 10
 	backgroundoffset = 350.0
 	record = 999999999
 	uff = 0
@@ -213,7 +223,8 @@ def level(lives, screen, screentoscale):
 			powermetertext = font_meter.render(str(player.power), False, (255,0,255))
 		else:
 			powermetertext = font_meter.render(str(player.power), False, (255,255,255))
-		backgroundoffset += 0.1
+		if backgroundoffset < backgroundheight:
+			backgroundoffset += 0.1
 		
 		#========= Eventos de teclado: =========
 		
@@ -267,7 +278,7 @@ def level(lives, screen, screentoscale):
 						player.invulntime = 15
 				elif event.key == pygame.K_f:
 					if debugmode:
-						backgroundoffset = -400
+						backgroundoffset += 100
 				elif event.key == pygame.K_h:
 					if debugmode:
 						debugshowhitboxes = not debugshowhitboxes
@@ -333,12 +344,15 @@ def level(lives, screen, screentoscale):
 		for i in particles:
 			i.update()
 			screentoscale.blit(i.image, i.rect)
-		for i in friendlybullets:
-			i.update()
-			screentoscale.blit(i.image, i.rect)
 		if player.chargeobj.active:
 			player.chargeobj.update()
 			screentoscale.blit(player.chargeobj.chargemask,(60,10))
+		for i in lasers:
+			i.update()
+			screentoscale.blit(i.image, i.rect)
+		for i in friendlybullets:
+			i.update()
+			screentoscale.blit(i.image, i.rect)
 		for i in bullets:
 			i.update()
 			if player.invulntime == 0:
@@ -383,6 +397,7 @@ def level(lives, screen, screentoscale):
 		if player.invulntime == 0:
 			if player.rect.collidelist(htbxlist) != -1:
 				player.hit()
+			player.checklasercollision()
 		else:
 			if player.invulntime > 90:
 				for i in reversed(bullets):
@@ -401,7 +416,10 @@ def level(lives, screen, screentoscale):
 def scorescreen(screen, screentoscale):
 	return
 
+currentlevel = 0
 while 1:
-	funk = level(2,screen,screentoscale)
+	funk = level(currentlevel,2,screen,screentoscale)
 	if funk == 1:
 		sys.exit()
+	elif funk == 3:
+		currentlevel += 1

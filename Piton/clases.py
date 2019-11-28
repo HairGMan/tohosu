@@ -9,6 +9,49 @@ pygame.init()
 currentenemyid = 0
 seed()
 
+class Laser(pygame.sprite.Sprite):
+	def __init__(self,origin,angle,width,duration):
+		pygame.sprite.Sprite.__init__(self)
+		self.origin = origin
+		if angle == -1:
+			self.angle = phase(complex(float((origin[0] - player.rect.x)),float((origin[1] - player.rect.y)))) * 180 / pi + 90
+			if self.angle < 0:
+				self.angle = 360 + self.angle
+			print self.angle
+		else:
+			self.angle = angle
+		self.duration = duration
+		self.image = pygame.image.load("sprites/laser.png").convert_alpha()
+		self.actuallaserwidth = self.image.get_width()*width
+		self.image = pygame.transform.scale(self.image,(self.actuallaserwidth,self.image.get_height()))
+		self.image = pygame.transform.rotate(self.image,-self.angle)
+		self.rect = self.image.get_rect()
+		self.lasermask = pygame.mask.from_surface(self.image)
+		if self.angle <= 90:
+			self.rect.topright = self.origin
+			self.rect.right += self.actuallaserwidth/2
+			self.rect.top -= self.actuallaserwidth/2
+		elif self.angle <= 180:
+			self.rect.bottomright = self.origin
+			self.rect.right += self.actuallaserwidth/2
+			self.rect.bottom += self.actuallaserwidth/2
+		elif self.angle <= 270:
+			self.rect.bottomleft = self.origin
+			self.rect.left -= self.actuallaserwidth/2
+			self.rect.bottom += self.actuallaserwidth/2
+		elif self.angle <= 360:
+			self.rect.topleft = self.origin
+			self.rect.left -= self.actuallaserwidth/2
+			self.rect.top -= self.actuallaserwidth/2
+			
+	def update(self):
+		self.duration -= 1
+		if self.duration == 0:
+			self.delete()
+			
+	def delete(self):
+		lasers.remove(self)
+
 class Highscore():
 	def __init__(self,score,name):
 		self.score = score
@@ -89,7 +132,7 @@ class Item(pygame.sprite.Sprite):
 		
 	def update(self):
 		if self.autocollected == True:
-			 self.movepos = trackplayer(self,player,4)
+			 self.movepos = trackplayer(self.rect,player.rect,4)
 		self.vectpos[0] += self.movepos[0]
 		self.vectpos[1] += self.movepos[1]
 		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
@@ -262,16 +305,16 @@ class Enemy(pygame.sprite.Sprite):
 			
 	def PatternTrack1(self):
 		for s in range(self.patterninstances - 1):
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation)),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1))),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation)),(float(self.rect.centerx),float(self.rect.centery))))
 	
 	def PatternTrack2(self):
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
-		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation+self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
+		bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation-self.angleinterval/2)),(float(self.rect.centerx),float(self.rect.centery))))
 		for s in range(self.patterninstances - 1):
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
-			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self,player,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation+self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
+			bullets.append(self.bulletdict[self.bullettype]((trackplayer(self.rect,player.rect,self.bulletspeed,self.patternrotation-self.angleinterval*(s+1.5))),(float(self.rect.centerx),float(self.rect.centery))))
 			
 	def PatternSpiral(self):
 		for s in range(self.patterninstances):
@@ -357,9 +400,9 @@ class BulletB(Bullet):
 class BulletC(Bullet):
 	def __init__(self,speed,startpos):
 		self.baseimage = pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha()
-		self.image = pygame.transform.rotate(self.baseimage,dirtoangle(*speed))
-		self.rect = self.image.get_rect()
+		self.rect = self.baseimage.get_rect()
 		self.rect.inflate_ip(-10,-10)
+		self.image = pygame.transform.rotate(self.baseimage,dirtoangle(*speed))
 		Bullet.__init__(self,speed,startpos)
 
 class BulletD(Bullet):
@@ -600,6 +643,12 @@ class Player(pygame.sprite.Sprite):
 	def autocollect(self):
 		for i in items:
 			i.autocollected = True
+			
+	def checklasercollision(self):
+		for l in lasers:
+			if l.rect.colliderect(self.rect):
+				if l.lasermask.get_at((self.rect.centerx-l.rect.left,self.rect.centery-l.rect.top)):
+					self.hit()
 				
 def createenemy(startposx,startposy,pattern,bullettype,instances = 1,angleinterval = 0,rotation = 0,patternspeed = 10,bulletspeed = 3,bulletspeedfrac = 1,delay = 0,health = 1,drop = 1,killpoint = 300):
 	startpos = (startposx,startposy)
@@ -632,11 +681,16 @@ def switchshot(id,pattern,bullettype = 1,instances = 1,interval = 0,rotation = 0
 				e.bulletspeed = float(bulletspeed) / bulletspeedfrac
 				e.shootclock = 0
 			
-def trackplayer(enemy,player,speed,offset = 0.0):
-	distance = complex(float((enemy.rect.centerx - player.rect.x)),float((enemy.rect.centery - player.rect.y)))
+def trackplayer(enemyrect,playerrect,speed,offset = 0.0):
+	distance = complex(float((enemyrect.centerx - playerrect.x)),float((enemyrect.centery - playerrect.y)))
 	b_phase = phase(distance) + (offset/180*pi)
 	bulletdirection = rect(-speed,b_phase)
 	return bulletdirection.real, bulletdirection.imag
+	
+def shootlaser(enemy,angle,width,duration):
+	for e in enemies:
+		if e.id == enemy:
+			lasers.append(Laser(e.rect.center,angle,width,duration))
 	
 def angletodir(speed,angle):
 	bulletdirection = rect(speed,(angle/180*pi))
@@ -673,6 +727,7 @@ particles = list()
 htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
+lasers = list()
 player = Player()
 highscores = [
 	Highscore(400000,"Maldonado"),

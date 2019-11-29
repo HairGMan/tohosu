@@ -5,7 +5,7 @@ class Cursor(pygame.Rect):
 	def __init__(self):
 		pygame.Rect.__init__(self,0,0,1,1)
 	def update(self):
-		self.left,self.top=pygame.mouse.get_pos()
+		self.topleft = pygame.mouse.get_pos()
        
 class boton(pygame.sprite.Sprite):
    def __init__(self,imagen1,imagen2,x=200,y=200):

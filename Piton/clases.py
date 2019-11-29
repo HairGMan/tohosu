@@ -9,6 +9,74 @@ pygame.init()
 currentenemyid = 0
 seed()
 
+size = width, height = 640, 360
+screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
+screentoscale = screen.copy()
+screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
+area = screen.get_rect()
+playrect = Rect(60,10,340,340)
+bulletliferect = Rect(30,0,400,360)
+font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
+font_small = pygame.font.Font("sprites/MSGOTHIC.TTC", 10)
+font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
+font_bold.set_bold(True)
+font_meter = pygame.font.Font("sprites/MSGOTHIC.TTC", 18)
+bullets = list()
+enemies = list()
+enemyhtbxlist = list()
+bullethtbxlist = list()
+items = list()
+particles = list()
+htbxlist = list()
+friendlybullets = list()
+friendlyhtbxlist = list()
+lasers = list()
+scalefactor = 3
+
+images = {
+	"image_laser": 		pygame.image.load("sprites/laser.png").convert_alpha(),
+	"image_p_red": 		pygame.image.load("sprites/item_p_red_tr.png").convert_alpha(),
+	"image_p_blue": 		pygame.image.load("sprites/item_p_blue_tr.png").convert_alpha(),
+	"image_c_green":		pygame.image.load("sprites/item_c_green_tr.png").convert_alpha(),
+	"image_e_1up": 		pygame.image.load("sprites/item_1up_tr.png").convert_alpha(),
+	"image_enemy":		pygame.image.load("sprites/placeenemysmall_tr.png").convert_alpha(),
+	"image_bulleta":		pygame.image.load("sprites/bullet4_tr.png").convert_alpha(),
+	"image_bulletb": 	pygame.image.load("sprites/bulletbig3_tr.png").convert_alpha(),
+	"image_bulletc": 	pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha(),
+	"image_bulletd":		pygame.image.load("sprites/bullet5_tr.png").convert_alpha(),
+	"image_bullete":		pygame.image.load("sprites/bulletsmol_tr.png").convert_alpha(),
+	"image_bulletfa":	pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha(),
+	"image_bulletfb":	pygame.image.load("sprites/bulletfriendlyb_tr.png").convert_alpha(),
+	"image_player":		pygame.image.load("sprites/placehtbxsmall_tr.png").convert_alpha()
+}
+
+class Cursor(pygame.Rect):
+	def __init__(self):
+		pygame.Rect.__init__(self,0,0,1,1)
+	def update(self):
+		self.topleft = pygame.mouse.get_pos()
+       
+
+class Button(pygame.sprite.Sprite):
+   def __init__(self,imagen1,imagen2,x=200,y=200):
+	   self.imagen_normal = imagen1
+	   self.imagen_seleccion = imagen2
+	   self.imagen_actual = self.imagen_normal
+	   self.rect = self.imagen_actual.get_rect()
+	   self.rect.topleft = (x,y)
+	   self.imgpos = self.rect.copy()
+	   self.rect.topleft = (x*scalefactor,y*scalefactor)
+	   self.rect.height = self.rect.height * scalefactor
+	   self.rect.width = self.rect.width * scalefactor
+       
+   def update(self,pantalla,cursor): 
+		if cursor.colliderect(self.rect):
+			self.imagen_actual = self.imagen_seleccion
+		else: self.imagen_actual = self.imagen_normal 
+		 
+		 
+		screentoscale.blit(self.imagen_actual,self.imgpos)
+
 class Laser(pygame.sprite.Sprite):
 	def __init__(self,origin,angle,width,duration,chargephase,enemyid):
 		pygame.sprite.Sprite.__init__(self)
@@ -25,7 +93,7 @@ class Laser(pygame.sprite.Sprite):
 		self.chargephase = chargephase
 		self.durationcounter = 0
 		self.active = False
-		self.baseimage = pygame.image.load("sprites/laser.png").convert_alpha()
+		self.baseimage = images["image_laser"]
 		self.width = width
 		self.actuallaserwidth = self.baseimage.get_width()*width
 		self.image = pygame.transform.scale(self.baseimage,(self.actuallaserwidth,self.baseimage.get_height()))
@@ -175,7 +243,7 @@ class Item(pygame.sprite.Sprite):
 		
 class ItemPower(Item):
 	def __init__(self,startpos):
-		self.image = pygame.image.load("sprites/item_p_red_tr.png").convert_alpha()
+		self.image = images["image_p_red"]
 		self.score = 2
 		self.dropstring = "+1"
 		Item.__init__(self,startpos)
@@ -188,7 +256,7 @@ class ItemPower(Item):
 
 class ItemPoint(Item):
 	def __init__(self,startpos):
-		self.image = pygame.image.load("sprites/item_p_blue_tr.png").convert_alpha()
+		self.image = images["image_p_blue"]
 		self.score = 100
 		self.dropstring = str(self.score*10)
 		Item.__init__(self,startpos)
@@ -203,7 +271,7 @@ class ItemPoint(Item):
 		
 class ItemCharge(Item):
 	def __init__(self,startpos):
-		self.image = pygame.image.load("sprites/item_c_green_tr.png").convert_alpha()
+		self.image = images["image_c_green"]
 		self.score = 20
 		self.dropstring = "Carga"
 		Item.__init__(self,startpos)
@@ -214,7 +282,7 @@ class ItemCharge(Item):
 		
 class ItemExtend(Item):
 	def __init__(self,startpos):
-		self.image = pygame.image.load("sprites/item_1up_tr.png").convert_alpha()
+		self.image = images["image_e_1up"]
 		self.score = 20
 		self.dropstring = "1UP"
 		Item.__init__(self,startpos)
@@ -249,7 +317,7 @@ class Option():
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self,startpos,pattern,bullettype,instances,angleinterval,rotation,patternspeed,bulletspeed,bulletspeedfrac,delay,health,drop,killpoint):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load("sprites/placeenemysmall_tr.png").convert_alpha()
+		self.image = images["image_enemy"]
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		self.init(startpos)
@@ -415,21 +483,21 @@ class Bullet(pygame.sprite.Sprite):
 		
 class BulletA(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("sprites/bullet4_tr.png").convert_alpha()
+		self.image = images["image_bulleta"]
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		Bullet.__init__(self,speed,startpos)
 
 class BulletB(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("sprites/bulletbig3_tr.png").convert_alpha()
+		self.image = images["image_bulletb"]
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-12,-12)
 		Bullet.__init__(self,speed,startpos)
 		
 class BulletC(Bullet):
 	def __init__(self,speed,startpos):
-		self.baseimage = pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha()
+		self.baseimage = images["image_bulletc"]
 		self.rect = self.baseimage.get_rect()
 		self.rect.inflate_ip(-10,-10)
 		self.image = pygame.transform.rotate(self.baseimage,dirtoangle(*speed))
@@ -437,14 +505,14 @@ class BulletC(Bullet):
 
 class BulletD(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("sprites/bullet5_tr.png").convert_alpha()
+		self.image = images["image_bulletd"]
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-4,-4)
 		Bullet.__init__(self,speed,startpos)
 
 class BulletE(Bullet):
 	def __init__(self,speed,startpos):
-		self.image = pygame.image.load("sprites/bulletsmol_tr.png").convert_alpha()
+		self.image = images["image_bullete"]
 		self.rect = self.image.get_rect()
 		Bullet.__init__(self,speed,startpos)
 		
@@ -477,12 +545,12 @@ class BulletFriendly(Bullet):
 		
 class BulletFriendlyA(BulletFriendly):
 	def __init__(self,speed,playerrect,offset):
-		self.image = pygame.image.load("sprites/bulletfriendly_tr.png").convert_alpha()
+		self.image = images["image_bulletfa"]
 		BulletFriendly.__init__(self,speed,playerrect,offset)
 		
 class BulletFriendlyB(BulletFriendly):
 	def __init__(self,speed,playerrect,offset):
-		self.image = pygame.image.load("sprites/bulletfriendlyb_tr.png").convert_alpha()
+		self.image = images["image_bulletfb"]
 		BulletFriendly.__init__(self,speed,playerrect,offset)
 		
 class Charge(pygame.sprite.Sprite):
@@ -530,7 +598,7 @@ class Player(pygame.sprite.Sprite):
 	
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load("sprites/placehtbxsmall_tr.png").convert_alpha()
+		self.image = images["image_player"]
 		self.rect = self.image.get_rect()
 		self.rect.inflate_ip(-8,-8)
 		self.imagecenter = [self.image.get_width()/2, self.image.get_height()/2]
@@ -557,6 +625,7 @@ class Player(pygame.sprite.Sprite):
 		self.movepos = [0,0]
 		self.invulntime = 0
 		self.power = 0
+		self.fullpowersign = 0
 		self.pattern = self.lvl1Pattern
 		self.score = 0
 		self.shootclock = 5
@@ -575,8 +644,11 @@ class Player(pygame.sprite.Sprite):
 			pygame.event.pump()
 		if not self.invulntime == 0:
 			self.invulntime -= 1
-		if (self.power == 64) & (self.rect.centery < 50):
-			self.autocollect()
+		if self.power == 64:
+			if self.fullpowersign > 0:
+				self.fullpowersign -= 1
+			if self.rect.centery < 50:
+				self.autocollect()
 			
 	def hit(self):
 			for i in range(8):
@@ -660,6 +732,7 @@ class Player(pygame.sprite.Sprite):
 			self.fullpower()
 
 	def fullpower(self):
+		self.fullpowersign = 90
 		for b in reversed(bullets):
 			b.delete()
 		return
@@ -739,29 +812,7 @@ def funcionparamezclarlistasporqueelprofequierequeusemospython2quenotieneesafunc
 	for i in range(offset,len(list)):
 		j = randrange(offset,i+1)
 		list[i], list[j] = list[j], list[i]
-
-size = width, height = 640, 360
-screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
-screentoscale = screen.copy()
-screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
-area = screen.get_rect()
-playrect = Rect(60,10,340,340)
-bulletliferect = Rect(30,0,400,360)
-font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
-font_small = pygame.font.Font("sprites/MSGOTHIC.TTC", 10)
-font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
-font_bold.set_bold(True)
-font_meter = pygame.font.Font("sprites/MSGOTHIC.TTC", 18)
-bullets = list()
-enemies = list()
-enemyhtbxlist = list()
-bullethtbxlist = list()
-items = list()
-particles = list()
-htbxlist = list()
-friendlybullets = list()
-friendlyhtbxlist = list()
-lasers = list()
+		
 player = Player()
 highscores = [
 	Highscore(400000,"Maldonado"),
@@ -775,3 +826,4 @@ highscores = [
 	Highscore(40000,"Diana"),
 	Highscore(20000,"Doyel")
 ]
+

@@ -2,12 +2,16 @@
 import clases
 from clases import *
 
+def reescalatodopibe(scalefactor):
+	for i in images.keys():
+		images[i] = pygame.transform.scale(images[i],(images[i].get_width()*scalefactor,images[i].get_height()*scalefactor))
+
 def pause():
 	global screen
 	pygame.mixer.music.pause()
-	cursor = pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha()
+	cursor = clases.images["image_bulletc"]
 	cursorpos = [120,200]
-	pausemask = pygame.Surface((341,340),HWSURFACE)
+	pausemask = pygame.Surface((340,340),HWSURFACE)
 	pausemask.fill((0,0,0))
 	pausemask.set_alpha(60)
 	screentoscale.blit(pausemask,(60,10))
@@ -82,12 +86,48 @@ def highscorescreen():
 		pygame.transform.scale(screentoscale, screen.get_size(), screen)
 		pygame.display.update()
 
+def mainmenu():
+	pygame.mouse.set_visible(True)
+	rojo1 = pygame.image.load("sprites/jugar1.jpeg")
+	rojo2 = pygame.image.load("sprites/jugar2.jpeg")
+	opciones = pygame.image.load("sprites/opciones.jpeg")
+	opciones2 = pygame.image.load("sprites/opciones2.jpeg")
+	salir = pygame.image.load("sprites/salir.jpeg")
+	salir2 = pygame.image.load("sprites/salir2.jpeg")
+	imagenfondo = pygame.image.load("sprites/fondo.jpeg")
+	boton1 = Button(rojo1,rojo2,200,100)
+	boton2 = Button(opciones,opciones2,200,200)
+	boton3 = Button(salir,salir2,200,300)
+	cursor = Cursor()
+
+	while 1:
+		clock.tick_busy_loop(60) 
+		for event in pygame.event.get():
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if cursor.colliderect(boton1.rect):
+					return 1
+				elif cursor.colliderect(boton2.rect):
+					return 2
+				elif cursor.colliderect(boton3.rect):
+					return 3
+			if event.type == pygame.QUIT:
+				sys.exit()
+		 
+		screentoscale.blit(imagenfondo,(0,0))
+		cursor.update()
+		boton1.update(screentoscale,cursor)
+		boton2.update(screentoscale,cursor)
+		boton3.update(screentoscale,cursor)
+		pygame.transform.scale(screentoscale, screen.get_size(), screen)
+		pygame.display.update()
+
+
 def gameover():
 	global screen
 	pygame.mixer.music.stop()
-	cursor = pygame.image.load("sprites/bullet6_p_tr.png").convert_alpha()
+	cursor = clases.images["image_bulletc"]
 	cursorpos = (120,220)
-	gameovermask = pygame.Surface((341,340),HWSURFACE)
+	gameovermask = pygame.Surface((340,340),HWSURFACE)
 	gameovermask.fill((0,0,0))
 	gameovermask.set_alpha(60)
 	screentoscale.blit(gameovermask,(60,10))
@@ -209,6 +249,7 @@ def level(level, lives, screen, screentoscale):
 	scoretext = font.render("Puntaje", False, (255,255,255))
 	recordtext = font.render(u"Récord", False, (255,255,255))
 	recordamount = font.render(str(record).zfill(11) + "0", False, (255,255,255))
+	fullpowersign = font_bold.render(u"¡Máximo poder!", False, (255,255,255))
 	powermeter = pygame.Surface((128,20))
 	powermeter.fill((255,255,255))
 	powermeter.set_alpha(150)
@@ -381,6 +422,8 @@ def level(level, lives, screen, screentoscale):
 		screentoscale.blit(powermetertext,(475,210))
 		screentoscale.blit(powersprite,(450,211))
 		screentoscale.blit(uffmeter,(450,240))
+		if player.fullpowersign > 0:
+			screentoscale.blit(fullpowersign,(playrect.centerx-fullpowersign.get_width()/2,playrect.centery-fullpowersign.get_height()/2))
 		#========= Manejo de vidas: =========
 		
 		for i in range(player.lives - 1):
@@ -420,9 +463,13 @@ def scorescreen(screen, screentoscale):
 	return
 
 currentlevel = 0
+menuoption = mainmenu()
 while 1:
-	funk = level(currentlevel,2,screen,screentoscale)
-	if funk == 1:
+	if menuoption == 1:
+		funk = level(currentlevel,2,screen,screentoscale)
+		if funk == 1:
+			menuoption = mainmenu()
+		elif funk == 3:
+			currentlevel += 1
+	elif menuoption == 3:
 		sys.exit()
-	elif funk == 3:
-		currentlevel += 1

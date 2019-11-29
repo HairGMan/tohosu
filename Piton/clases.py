@@ -17,9 +17,9 @@ class Laser(pygame.sprite.Sprite):
 			self.angle = phase(complex(float((origin[0] - player.rect.x)),float((origin[1] - player.rect.y)))) * 180 / pi + 90
 			if self.angle < 0:
 				self.angle = 360 + self.angle
-			print self.angle
 		else:
-			self.angle = angle
+			self.angle = float(angle)
+		print self.angle
 		self.duration = duration
 		self.enemyid = enemyid
 		self.chargephase = chargephase

@@ -337,6 +337,10 @@ def level(level, lives, screen, screentoscale):
 				debughtbxmarker = pygame.Surface((i.width,i.height))
 				debughtbxmarker.fill((255,255,255))
 				screentoscale.blit(debughtbxmarker,i)
+		for i in lasers:
+			i.update()
+			if i.active:
+				screentoscale.blit(i.image, i.rect)
 		for i in enemies:
 			i.update()
 			screentoscale.blit(i.image, i.imgpos)
@@ -349,10 +353,6 @@ def level(level, lives, screen, screentoscale):
 		if player.chargeobj.active:
 			player.chargeobj.update()
 			screentoscale.blit(player.chargeobj.chargemask,(60,10))
-		for i in lasers:
-			i.update()
-			if i.active:
-				screentoscale.blit(i.image, i.rect)
 		for i in friendlybullets:
 			i.update()
 			screentoscale.blit(i.image, i.rect)

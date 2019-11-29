@@ -32,4 +32,7 @@ Recomendado formatear instrucciones enemy asi (con tab):
 	50 enemy 130 -30	3 3 1 9 0 15 4 1 40	30 2 500
 		Coords		Variables de patron	Stats
 
-move: 
+move: [id del enemigo, x, y, veces]
+laser: [id del enemigo | angulo | ancho | duracion | tiempo de preparacion]
+Hace que cierto enemigo tire un laser, el tiempo de preparación serían las frames en las que te aparece una linea en donde despues va a aparecer el laser.
+	- Si angulo = -1 el laser se tira donde esta el jugador en el momento

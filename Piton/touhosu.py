@@ -95,6 +95,8 @@ def mainmenu():
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.load("sprites/pantalla_de_titulo_que_no_existe3.wav")
 			pygame.mixer.music.play(-1)
+	title = font_bold.render("Proyecto TOHOSU",False,(255,255,255))
+	subtitle = font.render("No se como ponerle wexd",False,(255,255,255))
 	rojo1 = pygame.image.load("sprites/jugar1_tr.png").convert_alpha()
 	rojo2 = pygame.image.load("sprites/jugar2_tr.png").convert_alpha()
 	opciones = pygame.image.load("sprites/opciones_tr.png").convert_alpha()
@@ -105,10 +107,10 @@ def mainmenu():
 	salir2 = pygame.image.load("sprites/salir2_tr.png")
 	imagenfondo = pygame.image.load("sprites/background_main.png")
 	botones = [
-		Button(rojo1,rojo2,330,210),
-		Button(opciones,opciones2,330,240),
-		Button(records,records2,330,270),
-		Button(salir,salir2,330,300)
+		Button(rojo1,rojo2,285,210),
+		Button(opciones,opciones2,285,240),
+		Button(records,records2,285,270),
+		Button(salir,salir2,285,300)
 	]
 	cursor = Cursor()
 
@@ -128,6 +130,8 @@ def mainmenu():
 				sys.exit()
 		 
 		screentoscale.blit(imagenfondo,(0,0))
+		screentoscale.blit(title,(screentoscale.get_width()/2-title.get_width()/2,30))
+		screentoscale.blit(subtitle,(screentoscale.get_width()/2-subtitle.get_width()/2,50))
 		cursor.update()
 		for b in botones:
 			b.update(screentoscale,cursor)

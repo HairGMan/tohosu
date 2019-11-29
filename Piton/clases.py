@@ -9,13 +9,15 @@ pygame.init()
 currentenemyid = 0
 seed()
 
+fullscreen = True
 size = width, height = 640, 360
-screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF)
+screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
-#screen = pygame.display.set_mode((1366,768),RESIZABLE|DOUBLEBUF|FULLSCREEN)
+screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
+itemliferect = bulletliferect.inflate(30,30)
 font = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
 font_small = pygame.font.Font("sprites/MSGOTHIC.TTC", 10)
 font_bold = pygame.font.Font("sprites/MSGOTHIC.TTC", 20)
@@ -31,7 +33,16 @@ htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
 lasers = list()
-scalefactor = 1
+scalefactor = 3
+musica = True
+vidasiniciales = 3
+fullscreen = True
+
+resolutions = {
+		1: (640,360),
+		2: (1280,720),
+		3: (1920,1080)
+	}
 
 images = {
 	"image_laser": 		pygame.image.load("sprites/laser.png").convert_alpha(),
@@ -49,6 +60,11 @@ images = {
 	"image_bulletfb":	pygame.image.load("sprites/bulletfriendlyb_tr.png").convert_alpha(),
 	"image_player":		pygame.image.load("sprites/placehtbxsmall_tr.png").convert_alpha()
 }
+
+basesizes = dict()
+print pygame.display.list_modes()
+for key, value in images.iteritems():
+	basesizes.update({key:	value.get_size()})
 
 class Cursor(pygame.Rect):
 	def __init__(self):
@@ -232,7 +248,7 @@ class Item(pygame.sprite.Sprite):
 		self.vectpos[1] += self.movepos[1]
 		self.rect.move_ip((self.vectpos[0] - self.rect.x,self.vectpos[1] - self.rect.y))
 		pygame.event.pump()
-		if not bulletliferect.contains(self.rect):
+		if not itemliferect.contains(self.rect):
 			self.delete()
 		elif self.rect.colliderect(player.uffhtbx):
 			self.collect()
@@ -292,8 +308,9 @@ class ItemExtend(Item):
 		Item.collect(self)
 
 class Option():
-	def __init__(self,string,pos,id):
+	def __init__(self,string,pos,id,changepos = True):
 		self.string = string
+		self.changepos = changepos
 		self.pos = pos
 		self.selected = False
 		self.color = (255,255,255)
@@ -301,13 +318,15 @@ class Option():
 		
 	def select(self):
 		if not self.selected:
-			self.pos[0] += 20
+			if self.changepos:
+				self.pos[0] += 20
 			self.selected = not self.selected
 			self.color = (128,255,128)
 		
 	def deselect(self):
 		if self.selected:
-			self.pos[0] -= 20
+			if self.changepos:
+				self.pos[0] -= 20
 			self.selected = not self.selected
 			self.color = (255,255,255)
 	
@@ -335,7 +354,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.bullettype = bullettype
 		self.patternspeed = patternspeed
 		self.bulletspeed = float(bulletspeed) / bulletspeedfrac
-		self.patternrotation = rotation
+		self.patternrotation = float(rotation)
 		self.angleinterval = float(angleinterval)
 		
 		#=======Variables del enemigo======
@@ -607,7 +626,7 @@ class Player(pygame.sprite.Sprite):
 		self.uffhtbx.inflate_ip(10,10)
 		self.init()
 		
-	def init(self,lives = 1):
+	def init(self,lives = 1,power = 0,charge = 2):
 		self.score = 0
 		self.rect.x = 230
 		self.rect.y = 300
@@ -624,14 +643,14 @@ class Player(pygame.sprite.Sprite):
 			self.moveright()
 		self.movepos = [0,0]
 		self.invulntime = 0
-		self.power = 0
+		self.power = power
 		self.fullpowersign = 0
-		self.pattern = self.lvl1Pattern
+		self.changepattern()
 		self.score = 0
 		self.shootclock = 5
 		self.debuginvincible = False
 		self.lives = lives
-		self.charge = 2
+		self.charge = charge
 		self.chargeobj = Charge()
 
 	def update(self):

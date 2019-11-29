@@ -4,7 +4,7 @@ from clases import *
 
 def reescalatodopibe(scalefactor):
 	for i in images.keys():
-		images[i] = pygame.transform.scale(images[i],(images[i].get_width()*scalefactor,images[i].get_height()*scalefactor))
+		images[i] = pygame.transform.scale(images[i],resolutions[scalefactor])
 
 def pause():
 	global screen
@@ -17,7 +17,7 @@ def pause():
 	screentoscale.blit(pausemask,(60,10))
 	screentoscale.blit(font_bold.render("Juego en pausa", True, (255,255,255)),(120,50))
 	screenshot = screentoscale.copy()
-	options = [Option("Reanudar",[120,200],0), Option("Reiniciar",[120,230],1), Option(u"Ir al menú",[120,260],2)]
+	options = [Option("Reanudar",[120,200],-1), Option("Reiniciar",[120,230],1), Option(u"Ir al menú",[120,260],0)]
 	options[0].select()
 	selct_option = 0
 	while 1:
@@ -37,9 +37,9 @@ def pause():
 						selct_option += 1
 						cursorpos[1] += 30
 				elif event.key == pygame.K_ESCAPE:
-						return 0
+						return -1
 				elif event.key == pygame.K_z or event.key == pygame.K_RETURN:
-						return selct_option
+						return options[selct_option].id
 		for i in options:
 			i.deselect()
 		options[selct_option].select()
@@ -50,17 +50,19 @@ def pause():
 		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
 		pygame.display.flip()
 
-def highscorescreen():
+def highscorescreen(aftergame):
 	global screen
-	background = pygame.image.load("sprites/highscores_1_2.png").convert_alpha() 
+	pygame.mouse.set_visible(False)
+	background = pygame.image.load("sprites/background_highscores.png").convert_alpha() 
 	title = font_bold.render(u"Puntajes más altos",False,(255,255,100))
 	currenthighscore = -1
-	for s in highscores:
-		if player.score*10 > s.score:
-			currenthighscore = highscores.index(s)
-			highscores.insert(highscores.index(s),Highscore(player.score*10,""))
-			highscores.pop()
-			break
+	if aftergame:
+		for s in highscores:
+			if player.score*10 > s.score:
+				currenthighscore = highscores.index(s)
+				highscores.insert(highscores.index(s),Highscore(player.score*10,""))
+				highscores.pop()
+				break
 	while 1:
 		clock.tick_busy_loop(60)
 		for event in pygame.event.get():		
@@ -68,14 +70,15 @@ def highscorescreen():
 				sys.exit()
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
-					return
+					return 0
 				else:
 					if not currenthighscore == -1:
 						if event.key == pygame.K_BACKSPACE:
 							if len(highscores[currenthighscore].name) > 0:
 								highscores[currenthighscore].name = highscores[currenthighscore].name[:-1]
 						else:
-							highscores[currenthighscore].name += event.unicode
+							if len(highscores[currenthighscore].name) < 13:
+								highscores[currenthighscore].name += event.unicode
 						highscores[currenthighscore].updatename()
 						
 		screentoscale.blit(background,area)
@@ -88,43 +91,142 @@ def highscorescreen():
 
 def mainmenu():
 	pygame.mouse.set_visible(True)
-	rojo1 = pygame.image.load("sprites/jugar1.jpeg")
-	rojo2 = pygame.image.load("sprites/jugar2.jpeg")
-	opciones = pygame.image.load("sprites/opciones.jpeg")
-	opciones2 = pygame.image.load("sprites/opciones2.jpeg")
-	salir = pygame.image.load("sprites/salir.jpeg")
-	salir2 = pygame.image.load("sprites/salir2.jpeg")
-	imagenfondo = pygame.image.load("sprites/fondo.jpeg")
-	boton1 = Button(rojo1,rojo2,200,100)
-	boton2 = Button(opciones,opciones2,200,200)
-	boton3 = Button(salir,salir2,200,300)
+	if clases.musica:
+		if not pygame.mixer.music.get_busy():
+			pygame.mixer.music.load("sprites/pantalla_de_titulo_que_no_existe3.wav")
+			pygame.mixer.music.play(-1)
+	rojo1 = pygame.image.load("sprites/jugar1_tr.png").convert_alpha()
+	rojo2 = pygame.image.load("sprites/jugar2_tr.png").convert_alpha()
+	opciones = pygame.image.load("sprites/opciones_tr.png").convert_alpha()
+	opciones2 = pygame.image.load("sprites/opciones2_tr.png").convert_alpha()
+	records = pygame.image.load("sprites/records_tr.png").convert_alpha()
+	records2 = pygame.image.load("sprites/records2_tr.png").convert_alpha()
+	salir = pygame.image.load("sprites/salir_tr.png")
+	salir2 = pygame.image.load("sprites/salir2_tr.png")
+	imagenfondo = pygame.image.load("sprites/background_main.png")
+	botones = [
+		Button(rojo1,rojo2,330,210),
+		Button(opciones,opciones2,330,240),
+		Button(records,records2,330,270),
+		Button(salir,salir2,330,300)
+	]
 	cursor = Cursor()
 
 	while 1:
 		clock.tick_busy_loop(60) 
 		for event in pygame.event.get():
 			if event.type == pygame.MOUSEBUTTONDOWN:
-				if cursor.colliderect(boton1.rect):
+				if cursor.colliderect(botones[0].rect):
 					return 1
-				elif cursor.colliderect(boton2.rect):
+				elif cursor.colliderect(botones[1].rect):
 					return 2
-				elif cursor.colliderect(boton3.rect):
+				elif cursor.colliderect(botones[2].rect):
 					return 3
+				elif cursor.colliderect(botones[3].rect):
+					return -1
 			if event.type == pygame.QUIT:
 				sys.exit()
 		 
 		screentoscale.blit(imagenfondo,(0,0))
 		cursor.update()
-		boton1.update(screentoscale,cursor)
-		boton2.update(screentoscale,cursor)
-		boton3.update(screentoscale,cursor)
+		for b in botones:
+			b.update(screentoscale,cursor)
 		pygame.transform.scale(screentoscale, screen.get_size(), screen)
 		pygame.display.update()
 
-
-def gameover():
+def optionsmenu():
 	global screen
-	pygame.mixer.music.stop()
+	background = pygame.image.load("sprites/background_options.png")
+	cursor = clases.images["image_bulletc"]
+	cursorpos = [180,50]
+	options = [
+		Option(u"Resolución",(200,50),0,False),
+		Option(u"Música",(200,80),1,False),
+		Option(u"Pantalla",(200,110),2,False),
+		Option(u"Vidas",(200,140),3,False)
+	]
+	optionstates = [
+		[Option("1080",(400,50),3,False),Option("720",(450,50),2,False),Option("360",(500,50),1,False)],
+		[Option(u"Sí",(400,80),0,False),Option("No",(440,80),1,False)],
+		[Option("Completa",(400,110),0,False),Option("Ventana",(500,110),1,False)],
+		[Option("3",(400,140),0,False)]
+	]
+	options[0].select()
+	optionstates[3][0].string = str(clases.vidasiniciales)
+	selct_option = 0
+	selct_option_sub = [3-clases.scalefactor,int(not clases.musica),int(not clases.fullscreen),0]
+	while 1:
+		clock.tick_busy_loop(60)
+		for event in pygame.event.get():		
+			if event.type == pygame.QUIT: 
+				sys.exit()
+			elif event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_UP:
+					if selct_option > 0:
+						selct_option -= 1
+						cursorpos[1] -= 30
+				elif event.key == pygame.K_DOWN:
+					if selct_option < 3:
+						selct_option += 1
+						cursorpos[1] += 30
+				elif event.key == pygame.K_ESCAPE:
+						return 0
+				elif event.key == pygame.K_LEFT:
+						if selct_option_sub[selct_option] > 0:
+							selct_option_sub[selct_option] -= 1
+						if selct_option == 1: 
+							clases.musica = True
+							pygame.mixer.music.play(-1)
+						elif selct_option == 3:
+							if clases.vidasiniciales > 3:
+								clases.vidasiniciales -= 1
+							optionstates[selct_option][0].string = str(clases.vidasiniciales)
+				elif event.key == pygame.K_RIGHT:
+						if selct_option_sub[selct_option] < len(optionstates[selct_option])-1:
+							selct_option_sub[selct_option] += 1
+						if selct_option == 1: 
+							clases.musica = False
+							pygame.mixer.music.stop()
+						elif selct_option == 3:
+							if clases.vidasiniciales < 5:
+								clases.vidasiniciales += 1
+							optionstates[selct_option][0].string = str(clases.vidasiniciales)
+				if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:						
+						if selct_option == 0:
+							clases.scalefactor = optionstates[selct_option][selct_option_sub[selct_option]].id
+							if selct_option_sub[2] == 0:
+								screen = pygame.display.set_mode(resolutions[clases.scalefactor],RESIZABLE|FULLSCREEN)
+							else:
+								screen = pygame.display.set_mode(resolutions[clases.scalefactor],RESIZABLE)
+						elif selct_option == 2:
+							if selct_option_sub[selct_option] == 0:
+								screen = pygame.display.set_mode(resolutions[clases.scalefactor],RESIZABLE|FULLSCREEN)
+								clases.fullscreen = True
+							else:
+								screen = pygame.display.set_mode(resolutions[clases.scalefactor],RESIZABLE)
+								clases.fullscreen = False
+		for i in options:
+			i.deselect()
+		options[selct_option].select()
+		for i in optionstates:
+			for j in i:
+				j.deselect()
+		optionstates[selct_option][selct_option_sub[selct_option]].select()
+		screentoscale.blit(background,(0,0))
+		screentoscale.blit(cursor,cursorpos)
+		for i in options:
+			screentoscale.blit(i.render(),i.pos)
+		for i in optionstates:
+			for j in i:
+				screentoscale.blit(j.render(),j.pos)
+		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
+		pygame.display.update()
+
+	
+def gameover():
+	global screen, musica
+	if musica:
+		pygame.mixer.music.stop()
 	cursor = clases.images["image_bulletc"]
 	cursorpos = (120,220)
 	gameovermask = pygame.Surface((340,340),HWSURFACE)
@@ -134,7 +236,7 @@ def gameover():
 	screentoscale.blit(font_bold.render(u"¡Fin del juego!", True, (255,255,255)),(120,50))
 	screentoscale.blit(font_bold.render("Puntaje: " + str(player.score * 10), True, (255,255,255)),(120,80))
 	screenshot = screentoscale.copy()
-	options = [Option("Reiniciar",[120,220],0), Option(u"Ir al menú",[120,250],1)]
+	options = [Option("Reiniciar",[120,220],1), Option(u"Ir al menú",[120,250],0)]
 	options[0].select()
 	selct_option = 0
 	while 1:
@@ -163,7 +265,33 @@ def gameover():
 		for i in options:
 			screentoscale.blit(i.render(),i.pos)
 		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
-		pygame.display.flip()
+		pygame.display.update()
+	
+def victoryscreen(nextlevel):
+	global screen, musica
+	if musica:
+		pygame.mixer.music.stop()
+	gameovermask = pygame.Surface((340,340),HWSURFACE)
+	gameovermask.fill((0,0,0))
+	gameovermask.set_alpha(60)
+	screentoscale.blit(gameovermask,(60,10))
+	screentoscale.blit(font_bold.render(u"¡Ganaste!", True, (255,255,255)),(120,50))
+	if nextlevel == 4:
+		screentoscale.blit(font_bold.render("Puntaje final: " + str(player.score * 10), True, (255,255,255)),(120,80))
+	else:
+		screentoscale.blit(font_bold.render("Siguiente nivel: " + str(nextlevel), True, (255,255,255)),(120,80))
+	screenshot = screentoscale.copy()
+	while 1:
+		clock.tick_busy_loop(60)
+		for event in pygame.event.get():		
+			if event.type == pygame.QUIT: 
+				sys.exit()
+			elif event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_z or event.key == pygame.K_RETURN:
+							return
+		screentoscale.blit(screenshot,(0,0))
+		screen.blit(pygame.transform.scale(screentoscale, screen.get_size()), (0, 0))
+		pygame.display.update()
 
 #========= Funcion de salida:=========
 def haltandcatchfire():
@@ -187,6 +315,8 @@ def mandatodoalcarajo():
 	player.chargeobj.active = False
 	clases.currentenemyid = 0
 	player.image = pygame.image.load("sprites/placehtbxsmall_tr.png")
+	if clases.musica:
+		pygame.mixer.music.stop()
 
 #========= Lector de eventos: ==========
 
@@ -225,7 +355,7 @@ debugshowhitboxes = False
 
 def level(level, lives, screen, screentoscale):
 	pygame.mouse.set_visible(False)
-	global debugmode, debugenemycount, debugshowhitboxes
+	global debugmode, debugenemycount, debugshowhitboxes, musica
 	levelfolderdict = {
 		0: 	"NivelPrueba",
 		1: 	"Nivel1",
@@ -236,8 +366,9 @@ def level(level, lives, screen, screentoscale):
 	framecount = 0
 	ev = 0
 	eventend = False
-	pygame.mixer.music.load("../" + levelfolderdict[level] + "/nice_lvl_3.wav")
-	pygame.mixer.music.play(-1)
+	if musica:
+		pygame.mixer.music.load("../" + levelfolderdict[level] + "/nice_lvl_3.wav")
+		pygame.mixer.music.play(-1)
 	background = pygame.image.load("../" + levelfolderdict[level] + "/fondo.png").convert()
 	backgroundheight = background.get_height() + 10
 	backgroundoffset = 350.0
@@ -254,7 +385,7 @@ def level(level, lives, screen, screentoscale):
 	powermeter.fill((255,255,255))
 	powermeter.set_alpha(150)
 	powersprite = pygame.image.load("sprites/item_p_red_tr.png").convert_alpha()
-	player.init(lives)
+	player.init(lives,player.power,player.charge)
 	while 1:
 		clock.tick_busy_loop(60)
 		fps = font.render(str(int(clock.get_fps()) - 2) + "FPS", False, (255,255,255))
@@ -294,7 +425,7 @@ def level(level, lives, screen, screentoscale):
 						player.shootcharge()
 				elif event.key == pygame.K_ESCAPE:
 					pauseoption = pause()
-					if pauseoption == 0:
+					if pauseoption == -1:
 						pygame.mixer.music.unpause()
 						player.state = [0,0,3]
 						if pygame.key.get_pressed()[pygame.K_LSHIFT]:
@@ -309,7 +440,7 @@ def level(level, lives, screen, screentoscale):
 							player.moveright()
 					else:
 						mandatodoalcarajo()
-						return (pauseoption - 1)
+						return pauseoption
 				elif event.key == pygame.K_F4:
 					debugmode = not debugmode
 				elif event.key == pygame.K_m:
@@ -339,6 +470,9 @@ def level(level, lives, screen, screentoscale):
 						else:
 							player.power = 64
 						player.changepattern()
+				elif event.key == pygame.K_s:
+					if debugmode:
+						eventend = True
 						
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LSHIFT:
@@ -369,7 +503,7 @@ def level(level, lives, screen, screentoscale):
 				ev += 1
 			else:
 				eventend = True
-
+								
 		#========= Actualizacion: =========
 		
 		player.update()
@@ -434,8 +568,8 @@ def level(level, lives, screen, screentoscale):
 		if player.lives == 0:
 			gameoveroption = gameover()
 			mandatodoalcarajo()
-			if gameoveroption == 1:
-				highscorescreen()
+			if gameoveroption == 0:
+				highscorescreen(True)
 			return gameoveroption
 			
 		pygame.transform.scale(screentoscale, screen.get_size(), screen)
@@ -458,18 +592,37 @@ def level(level, lives, screen, screentoscale):
 		
 		pygame.display.update()
 		framecount += 1
+		
+		if eventend == True:
+			if len(enemies) == 0:
+				victoryscreen(level+1)
+				mandatodoalcarajo()
+				return 4
 
-def scorescreen(screen, screentoscale):
-	return
 
-currentlevel = 0
-menuoption = mainmenu()
+currentlevel = 1
+currentscreen = 0
 while 1:
-	if menuoption == 1:
-		funk = level(currentlevel,2,screen,screentoscale)
-		if funk == 1:
-			menuoption = mainmenu()
-		elif funk == 3:
+	if currentscreen == 0:
+		player.charge = 2
+		player.power = 0
+		currentlevel = 1
+		currentscreen = mainmenu()
+	elif currentscreen == 1:
+		currentscreen = level(currentlevel,clases.vidasiniciales,screen,screentoscale)
+		if currentscreen == 4:
 			currentlevel += 1
-	elif menuoption == 3:
+			if currentlevel == 4:
+				currentscreen = highscorescreen(True)
+			else:
+				currentscreen = 1
+		elif currentscreen == 1:
+			player.charge = 2
+			player.power = 0
+			currentlevel = 1
+	elif currentscreen == 2:
+		currentscreen = optionsmenu()
+	elif currentscreen == 3:
+		currentscreen = highscorescreen(False)
+	elif currentscreen == -1:
 		sys.exit()

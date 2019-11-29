@@ -1,4 +1,4 @@
-enemy: [x | y | patron | tipo de bala | instancias | angulo de separacion | rotacion del patron | frecuencia del patron | velocidad de balas (numerador) | velocidad de balas (denominador) | delay | vida {15} | drop {1} | puntos {300}]
+enemy: [x | y | patron | tipo de bala | instancias | angulo de separacion | rotacion del patron | frecuencia del patron | velocidad de balas (numerador) | velocidad de balas (denominador) | delay | vida {1} | drop {1} | puntos {300}]
 switch: [id | patron | tipo de bala {1} | instancias {1} | angulo {0} | rotacion {0} | frecuencia {10} | velocidad de balas (numerador) {3} | velocidad de balas (denominador) {1}]
 	-instancias: decide cuantas instancias del patron en simultaneo
 	-angulo de separacion: decide cuanta separacion (en grados) tienen las balas
@@ -18,7 +18,7 @@ Balas:
 	-3: Coso de los sims
 	-4: Bala normal pero con reskin
 	-5: Bala pequeña
-
+i
 Drops:
 	-1: Punto
 	-2: Poder

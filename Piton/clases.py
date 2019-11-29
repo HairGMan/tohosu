@@ -10,9 +10,9 @@ currentenemyid = 0
 seed()
 
 size = width, height = 640, 360
-screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
+screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF)
 screentoscale = screen.copy()
-screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
+#screen = pygame.display.set_mode((1366,768),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
@@ -31,7 +31,7 @@ htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
 lasers = list()
-scalefactor = 3
+scalefactor = 1
 
 images = {
 	"image_laser": 		pygame.image.load("sprites/laser.png").convert_alpha(),

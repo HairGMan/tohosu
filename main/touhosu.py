@@ -96,7 +96,7 @@ def mainmenu():
 			pygame.mixer.music.load("sprites/pantalla_de_titulo_que_no_existe3.wav")
 			pygame.mixer.music.play(-1)
 	title = font_bold.render("Proyecto TOHOSU",False,(255,255,255))
-	subtitle = font.render("No se como ponerle wexd",False,(255,255,255))
+	subtitle = font.render("Cool danmaku shooter definitivamente terminado",False,(255,255,255))
 	rojo1 = pygame.image.load("sprites/jugar1_tr.png").convert_alpha()
 	rojo2 = pygame.image.load("sprites/jugar2_tr.png").convert_alpha()
 	opciones = pygame.image.load("sprites/opciones_tr.png").convert_alpha()
@@ -378,7 +378,7 @@ def level(level, lives, screen, screentoscale):
 	backgroundoffset = 350.0
 	record = 999999999
 	uff = 0
-	gui = pygame.image.load("sprites/gui_place_nochoto_tr.png").convert_alpha()
+	gui = pygame.image.load("sprites/gui_place_final_tr.png").convert_alpha()
 	lifesprite = pygame.image.load("sprites/place_life_red2_tr.png").convert_alpha()
 	chargesprite = pygame.image.load("sprites/place_life_orange2_tr.png").convert_alpha()
 	scoretext = font.render("Puntaje", False, (255,255,255))

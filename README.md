@@ -13,3 +13,9 @@ COSAS A MODIFICAR:
 1. Añadir efectos de sonido.
 2. Añadir mas enemigos.
 3. Añadir jefes.
+
+![](screenshots/scr_mainmenu.png)
+![](screenshots/scr_game1.png)
+![](screenshots/scr_game2.png)
+![](screenshots/scr_game3.png)
+![](screenshots/scr_game4.png)

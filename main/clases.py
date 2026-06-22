@@ -13,7 +13,6 @@ fullscreen = True
 size = width, height = 640, 360
 screen = pygame.display.set_mode(size,RESIZABLE|DOUBLEBUF|FULLSCREEN)
 screentoscale = screen.copy()
-screen = pygame.display.set_mode((1920,1080),RESIZABLE|DOUBLEBUF|FULLSCREEN)
 area = screen.get_rect()
 playrect = Rect(60,10,340,340)
 bulletliferect = Rect(30,0,400,360)
@@ -33,7 +32,7 @@ htbxlist = list()
 friendlybullets = list()
 friendlyhtbxlist = list()
 lasers = list()
-scalefactor = 3
+scalefactor = 1
 musica = True
 vidasiniciales = 3
 fullscreen = True
